@@ -26,6 +26,9 @@ public class GrenadePickupItem : MonoBehaviour
     private float armedTime = 0f;
     private Coroutine fuseRoutine;
 
+    // NUEVO: guarda la escala original del prefab/objeto
+    private Vector3 originalLocalScale;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -33,6 +36,8 @@ public class GrenadePickupItem : MonoBehaviour
 
         if (mainCollider == null)
             mainCollider = GetComponent<Collider>();
+
+        originalLocalScale = transform.localScale;
     }
 
     public void EquipTo(Transform socket)
@@ -63,7 +68,9 @@ public class GrenadePickupItem : MonoBehaviour
         transform.SetParent(socket, false);
         transform.localPosition = Vector3.zero;
         transform.localRotation = Quaternion.identity;
-        transform.localScale = Vector3.one;
+
+        // CORREGIDO: ya no la deja en escala 1
+        transform.localScale = originalLocalScale;
     }
 
     public void DropFrom(Transform hand, Vector3 dropOffset, float dropForce)

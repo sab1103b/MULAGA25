@@ -285,8 +285,9 @@ MonoBehaviour:
   bulletSpeed: 20
   fireRate: 0.15
   spawnOffset: 0.5
+  automaticFire: 1
   maxShots: 20
-  cooldownTime: 5
+  cooldownTime: 3
   weaponEquip: {fileID: 1430788661}
 --- !u!1 &4696919
 GameObject:
@@ -4532,7 +4533,7 @@ Transform:
   m_GameObject: {fileID: 1367715563}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -5.0824995, y: 1.362, z: -145.0533}
+  m_LocalPosition: {x: -4.99, y: 1.362, z: -145.698}
   m_LocalScale: {x: 0.094541624, y: 0.094541624, z: 0.094541624}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4691,6 +4692,7 @@ MonoBehaviour:
   rightController: {fileID: 4344668}
   rightWeaponSocket: {fileID: 2063799360}
   rightControllerVisual: {fileID: 1598522983}
+  floatingVisual: {fileID: 1430788671}
   equipAction: {fileID: -3473508350751999343, guid: 760037ff4eac6804dae76d1187d56d2b, type: 3}
   muzzle: {fileID: 558551880}
   equipDistance: 1
@@ -4750,6 +4752,29 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.044982776, y: 0.16979818, z: 0.32972133}
   m_Center: {x: 0, y: 0.08489909, z: 0.12256044}
+--- !u!114 &1430788671
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1430788660}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e03fcd3274285c847820ca1c6dc11657, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FloatingVisual
+  hoverHeight: 0.08
+  floatAmplitude: 0.05
+  floatFrequency: 1.2
+  groundCheckDistance: 2
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  activationDelay: 0.25
+  settleLinearSpeed: 0.15
+  settleAngularSpeed: 0.15
+  rotationSpeed: 45
 --- !u!1 &1446809186
 GameObject:
   m_ObjectHideFlags: 0
@@ -5266,15 +5291,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 28ebbcd7f4773384e867c255af2c669b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -4.5944996
+      value: -4.762
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 28ebbcd7f4773384e867c255af2c669b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.266
+      value: 1.178
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 28ebbcd7f4773384e867c255af2c669b, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -144.7073
+      value: -145.072
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 28ebbcd7f4773384e867c255af2c669b, type: 3}
       propertyPath: m_LocalRotation.w
@@ -5324,6 +5349,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 28ebbcd7f4773384e867c255af2c669b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1430788661}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 28ebbcd7f4773384e867c255af2c669b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1430788671}
   m_SourcePrefab: {fileID: 100100000, guid: 28ebbcd7f4773384e867c255af2c669b, type: 3}
 --- !u!1 &1721988675
 GameObject:
@@ -5635,7 +5663,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Mediator: {fileID: 1469959300}
   m_TransformationPriority: 0
-  m_MoveSpeed: 2.5
+  m_MoveSpeed: 4
   m_InAirControlModifier: 0.5
   m_EnableStrafe: 1
   m_EnableFly: 0
