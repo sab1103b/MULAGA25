@@ -8,6 +8,7 @@ public class WeaponEquipRightVR : MonoBehaviour
     [SerializeField] private Transform rightController;
     [SerializeField] private Transform rightWeaponSocket;
     [SerializeField] private GameObject rightControllerVisual;
+    [SerializeField] private FloatingVisual floatingVisual;
 
     [Header("Input")]
     [SerializeField] private InputActionReference equipAction;
@@ -25,10 +26,32 @@ public class WeaponEquipRightVR : MonoBehaviour
 
     private Rigidbody rb;
     private bool isEquipped = false;
+    private Vector3 originalLocalScale;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        originalLocalScale = transform.localScale;
+
+        if (mainCollider == null)
+            mainCollider = GetComponent<Collider>();
+    }
+
+    private void Start()
+    {
+        bool startsEquipped = (rightWeaponSocket != null && transform.parent == rightWeaponSocket);
+        isEquipped = startsEquipped;
+
+        if (floatingVisual != null)
+        {
+            if (startsEquipped)
+                floatingVisual.NotifyPickedUp();
+            else
+                floatingVisual.NotifyDropped();
+        }
+
+        if (rightControllerVisual != null)
+            rightControllerVisual.SetActive(!startsEquipped);
     }
 
     private void OnEnable()
@@ -71,6 +94,9 @@ public class WeaponEquipRightVR : MonoBehaviour
     {
         isEquipped = true;
 
+        if (floatingVisual != null)
+            floatingVisual.NotifyPickedUp();
+
         if (rb != null)
         {
             rb.linearVelocity = Vector3.zero;
@@ -86,7 +112,7 @@ public class WeaponEquipRightVR : MonoBehaviour
         transform.SetParent(rightWeaponSocket, false);
         transform.localPosition = Vector3.zero;
         transform.localRotation = Quaternion.identity;
-        transform.localScale = Vector3.one;
+        transform.localScale = originalLocalScale;
 
         if (rightControllerVisual != null)
             rightControllerVisual.SetActive(false);
@@ -103,6 +129,8 @@ public class WeaponEquipRightVR : MonoBehaviour
             transform.position = rightController.TransformPoint(dropOffset);
             transform.rotation = rightController.rotation;
         }
+
+        transform.localScale = originalLocalScale;
 
         if (mainCollider != null)
             mainCollider.enabled = true;
@@ -121,17 +149,20 @@ public class WeaponEquipRightVR : MonoBehaviour
             rb.angularVelocity = Vector3.zero;
         }
 
+        if (floatingVisual != null)
+            floatingVisual.NotifyDropped();
+
         if (rightControllerVisual != null)
             rightControllerVisual.SetActive(true);
     }
 
-public bool HasWeapon()
-{
-    return isEquipped;
-}
+    public bool HasWeapon()
+    {
+        return isEquipped;
+    }
 
-public Transform GetMuzzle()
-{
-    return muzzle;
-}
+    public Transform GetMuzzle()
+    {
+        return muzzle;
+    }
 }
