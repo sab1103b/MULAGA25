@@ -4387,6 +4387,7 @@ GameObject:
   - component: {fileID: 1367715566}
   - component: {fileID: 1367715565}
   - component: {fileID: 1367715564}
+  - component: {fileID: 1367715570}
   m_Layer: 0
   m_Name: Granada
   m_TagString: Untagged
@@ -4408,6 +4409,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GrenadePickupItem
   mainCollider: {fileID: 1367715566}
   explosionEffectPrefab: {fileID: 0}
+  floatingVisual: {fileID: 1367715570}
   fuseTime: 6.17
   explosionRadius: 1.87
   explosionDamage: 153
@@ -4533,12 +4535,35 @@ Transform:
   m_GameObject: {fileID: 1367715563}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -4.99, y: 1.362, z: -145.698}
+  m_LocalPosition: {x: -5.302, y: 1.166, z: -145.698}
   m_LocalScale: {x: 0.094541624, y: 0.094541624, z: 0.094541624}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 950449494}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1367715570
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1367715563}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e03fcd3274285c847820ca1c6dc11657, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FloatingVisual
+  hoverHeight: 0.08
+  floatAmplitude: 0.015
+  floatFrequency: 1.5
+  groundCheckDistance: 2
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  activationDelay: 0.25
+  settleLinearSpeed: 0.15
+  settleAngularSpeed: 0.15
+  rotationSpeed: 35
 --- !u!1 &1424364815 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1767192433, guid: f6336ac4ac8b4d34bc5072418cdc62a0, type: 3}
@@ -5835,17 +5860,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LeftHandGrenadeController
   leftGrenadeSocket: {fileID: 2016723810}
+  grenadeStorageSocket: {fileID: 2016723810}
   pickupCheckPoint: {fileID: 1522288425}
   leftControllerVisual: {fileID: 75590439}
   pickupAction: {fileID: 2334944386246163597, guid: 760037ff4eac6804dae76d1187d56d2b, type: 3}
-  dropAction: {fileID: -6893087058682803755, guid: 760037ff4eac6804dae76d1187d56d2b, type: 3}
-  throwAction: {fileID: 1031366221611925010, guid: 760037ff4eac6804dae76d1187d56d2b, type: 3}
+  useGrenadeAction: {fileID: 1031366221611925010, guid: 760037ff4eac6804dae76d1187d56d2b, type: 3}
+  maxStoredGrenades: 3
+  useLastStoredFirst: 1
   pickupRadius: 0.25
   grenadePickupMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  dropOffset: {x: 0, y: -0.05, z: 0.2}
-  dropForce: 0.5
   throwForwardOffset: 0.12
   throwForce: 8
   throwUpForce: 1.5

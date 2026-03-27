@@ -8,6 +8,7 @@ public class GrenadePickupItem : MonoBehaviour
     [Header("Referencias")]
     [SerializeField] private Collider mainCollider;
     [SerializeField] private GameObject explosionEffectPrefab;
+    [SerializeField] private FloatingVisual floatingVisual;
 
     [Header("Explosión")]
     [SerializeField] private float fuseTime = 3f;
@@ -20,19 +21,20 @@ public class GrenadePickupItem : MonoBehaviour
 
     private Rigidbody rb;
     private Collider[] allColliders;
+    private Renderer[] allRenderers;
 
     private bool hasBeenThrown = false;
     private bool hasExploded = false;
     private float armedTime = 0f;
     private Coroutine fuseRoutine;
 
-    // NUEVO: guarda la escala original del prefab/objeto
     private Vector3 originalLocalScale;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
         allColliders = GetComponentsInChildren<Collider>(true);
+        allRenderers = GetComponentsInChildren<Renderer>(true);
 
         if (mainCollider == null)
             mainCollider = GetComponent<Collider>();
@@ -40,78 +42,74 @@ public class GrenadePickupItem : MonoBehaviour
         originalLocalScale = transform.localScale;
     }
 
+    private void Start()
+    {
+        bool startsAttached = transform.parent != null;
+
+        if (floatingVisual != null)
+        {
+            if (startsAttached)
+                floatingVisual.NotifyPickedUp();
+            else
+                floatingVisual.NotifyDropped();
+        }
+    }
+
+    public void StoreTo(Transform storageSocket)
+    {
+        ResetGrenadeState();
+
+        if (floatingVisual != null)
+            floatingVisual.NotifyPickedUp();
+
+        SetPhysicsHeldState();
+        SetAllCollidersEnabled(false);
+
+        if (storageSocket != null)
+        {
+            transform.SetParent(storageSocket, false);
+            transform.localPosition = Vector3.zero;
+            transform.localRotation = Quaternion.identity;
+        }
+        else
+        {
+            transform.SetParent(null, true);
+        }
+
+        transform.localScale = originalLocalScale;
+        SetVisible(false);
+    }
+
     public void EquipTo(Transform socket)
     {
         if (socket == null) return;
 
-        hasBeenThrown = false;
-        hasExploded = false;
+        ResetGrenadeState();
 
-        if (fuseRoutine != null)
-        {
-            StopCoroutine(fuseRoutine);
-            fuseRoutine = null;
-        }
+        if (floatingVisual != null)
+            floatingVisual.NotifyPickedUp();
 
-        rb.linearVelocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
-        rb.useGravity = false;
-        rb.isKinematic = true;
-        rb.detectCollisions = false;
-
-        foreach (Collider c in allColliders)
-        {
-            if (c != null)
-                c.enabled = false;
-        }
+        SetVisible(true);
+        SetPhysicsHeldState();
+        SetAllCollidersEnabled(false);
 
         transform.SetParent(socket, false);
         transform.localPosition = Vector3.zero;
         transform.localRotation = Quaternion.identity;
-
-        // CORREGIDO: ya no la deja en escala 1
         transform.localScale = originalLocalScale;
-    }
-
-    public void DropFrom(Transform hand, Vector3 dropOffset, float dropForce)
-    {
-        transform.SetParent(null, true);
-
-        if (hand != null)
-        {
-            transform.position = hand.TransformPoint(dropOffset);
-            transform.rotation = hand.rotation;
-        }
-
-        foreach (Collider c in allColliders)
-        {
-            if (c != null)
-                c.enabled = true;
-        }
-
-        rb.isKinematic = false;
-        rb.useGravity = true;
-        rb.detectCollisions = true;
-        rb.linearVelocity = hand != null ? hand.forward * dropForce : Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
-
-        hasBeenThrown = false;
     }
 
     public void ThrowFrom(Transform hand, float forwardOffset, float throwForce, float throwUpForce, float spinForce)
     {
         if (hand == null) return;
 
-        transform.SetParent(null, true);
+        SetVisible(true);
 
+        transform.SetParent(null, true);
         transform.position = hand.position + hand.forward * forwardOffset;
         transform.rotation = hand.rotation;
 
-        foreach (Collider c in allColliders)
-        {
-            if (c != null)
-                c.enabled = true;
-        }
+        SetAllCollidersEnabled(true);
 
         rb.isKinematic = false;
         rb.useGravity = true;
@@ -128,6 +126,48 @@ public class GrenadePickupItem : MonoBehaviour
             StopCoroutine(fuseRoutine);
 
         fuseRoutine = StartCoroutine(FuseRoutine());
+
+        if (floatingVisual != null)
+            floatingVisual.NotifyDropped();
+    }
+
+    private void ResetGrenadeState()
+    {
+        hasBeenThrown = false;
+        hasExploded = false;
+
+        if (fuseRoutine != null)
+        {
+            StopCoroutine(fuseRoutine);
+            fuseRoutine = null;
+        }
+    }
+
+    private void SetPhysicsHeldState()
+    {
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+        rb.useGravity = false;
+        rb.isKinematic = true;
+        rb.detectCollisions = false;
+    }
+
+    private void SetAllCollidersEnabled(bool enabled)
+    {
+        foreach (Collider c in allColliders)
+        {
+            if (c != null)
+                c.enabled = enabled;
+        }
+    }
+
+    private void SetVisible(bool visible)
+    {
+        foreach (Renderer r in allRenderers)
+        {
+            if (r != null)
+                r.enabled = visible;
+        }
     }
 
     private void IgnoreOwnerCollisions(Transform ownerRoot)
