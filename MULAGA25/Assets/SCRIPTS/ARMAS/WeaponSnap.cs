@@ -10,11 +10,12 @@ public class WeaponEquipRightVR : MonoBehaviour
     [SerializeField] private GameObject rightControllerVisual;
     [SerializeField] private FloatingVisual floatingVisual;
 
+    [Header("Puntos del arma")]
+    [SerializeField] private Transform muzzle;
+    [SerializeField] private Transform gripPoint; // Empty en la empuñadura
+
     [Header("Input")]
     [SerializeField] private InputActionReference equipAction;
-
-    [Header("Disparo")]
-    [SerializeField] private Transform muzzle;
 
     [Header("Ajustes")]
     [SerializeField] private float equipDistance = 0.35f;
@@ -26,12 +27,14 @@ public class WeaponEquipRightVR : MonoBehaviour
 
     private Rigidbody rb;
     private bool isEquipped = false;
-    private Vector3 originalLocalScale;
+
+    // Guardamos escala real en mundo
+    private Vector3 originalWorldScale;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
-        originalLocalScale = transform.localScale;
+        originalWorldScale = transform.lossyScale;
 
         if (mainCollider == null)
             mainCollider = GetComponent<Collider>();
@@ -52,6 +55,8 @@ public class WeaponEquipRightVR : MonoBehaviour
 
         if (rightControllerVisual != null)
             rightControllerVisual.SetActive(!startsEquipped);
+
+        SetWorldScale(originalWorldScale);
     }
 
     private void OnEnable()
@@ -110,9 +115,12 @@ public class WeaponEquipRightVR : MonoBehaviour
             mainCollider.enabled = false;
 
         transform.SetParent(rightWeaponSocket, false);
-        transform.localPosition = Vector3.zero;
-        transform.localRotation = Quaternion.identity;
-        transform.localScale = originalLocalScale;
+
+        // Mantener escala visual real
+        SetWorldScale(originalWorldScale);
+
+        // Alinear usando el punto de agarre
+        AlignUsingGripPoint();
 
         if (rightControllerVisual != null)
             rightControllerVisual.SetActive(false);
@@ -130,7 +138,7 @@ public class WeaponEquipRightVR : MonoBehaviour
             transform.rotation = rightController.rotation;
         }
 
-        transform.localScale = originalLocalScale;
+        SetWorldScale(originalWorldScale);
 
         if (mainCollider != null)
             mainCollider.enabled = true;
@@ -154,6 +162,56 @@ public class WeaponEquipRightVR : MonoBehaviour
 
         if (rightControllerVisual != null)
             rightControllerVisual.SetActive(true);
+    }
+
+    private void AlignUsingGripPoint()
+    {
+        if (gripPoint == null)
+        {
+            transform.localPosition = Vector3.zero;
+            transform.localRotation = Quaternion.identity;
+            return;
+        }
+
+        if (gripPoint.parent != transform)
+        {
+            Debug.LogWarning("WeaponEquipRightVR: GripPoint debería ser hijo directo del arma.");
+        }
+
+        // Queremos que GripPoint coincida exactamente con el socket
+        Quaternion targetLocalRotation = Quaternion.Inverse(gripPoint.localRotation);
+        Vector3 scaledGripLocalPos = Vector3.Scale(transform.localScale, gripPoint.localPosition);
+        Vector3 targetLocalPosition = -(targetLocalRotation * scaledGripLocalPos);
+
+        transform.localRotation = targetLocalRotation;
+        transform.localPosition = targetLocalPosition;
+    }
+
+    private void SetWorldScale(Vector3 targetWorldScale)
+    {
+        Transform parent = transform.parent;
+
+        if (parent == null)
+        {
+            transform.localScale = targetWorldScale;
+            return;
+        }
+
+        Vector3 parentWorldScale = parent.lossyScale;
+
+        transform.localScale = new Vector3(
+            SafeDivide(targetWorldScale.x, parentWorldScale.x),
+            SafeDivide(targetWorldScale.y, parentWorldScale.y),
+            SafeDivide(targetWorldScale.z, parentWorldScale.z)
+        );
+    }
+
+    private float SafeDivide(float value, float divisor)
+    {
+        if (Mathf.Abs(divisor) < 0.0001f)
+            return value;
+
+        return value / divisor;
     }
 
     public bool HasWeapon()

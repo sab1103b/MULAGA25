@@ -1770,6 +1770,9 @@ PrefabInstance:
     - {fileID: 3347417574320557245, guid: cf7f7bb9bc4f92e4faf4d321132f14be, type: 3}
     - {fileID: 6117733023077331362, guid: cf7f7bb9bc4f92e4faf4d321132f14be, type: 3}
     - {fileID: 8284076160794155778, guid: cf7f7bb9bc4f92e4faf4d321132f14be, type: 3}
+    - {fileID: 5234228751819935743, guid: cf7f7bb9bc4f92e4faf4d321132f14be, type: 3}
+    - {fileID: -5696738738164018045, guid: cf7f7bb9bc4f92e4faf4d321132f14be, type: 3}
+    - {fileID: 559631644292008088, guid: cf7f7bb9bc4f92e4faf4d321132f14be, type: 3}
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 6429264744925529233, guid: cf7f7bb9bc4f92e4faf4d321132f14be, type: 3}
       insertIndex: -1
@@ -2041,17 +2044,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LeftHandGrenadeController
   leftGrenadeSocket: {fileID: 749998093}
+  grenadeStorageSocket: {fileID: 0}
   pickupCheckPoint: {fileID: 52034329}
   leftControllerVisual: {fileID: 1757554460}
   pickupAction: {fileID: 2334944386246163597, guid: 760037ff4eac6804dae76d1187d56d2b, type: 3}
-  dropAction: {fileID: -6893087058682803755, guid: 760037ff4eac6804dae76d1187d56d2b, type: 3}
-  throwAction: {fileID: 1031366221611925010, guid: 760037ff4eac6804dae76d1187d56d2b, type: 3}
+  useGrenadeAction: {fileID: 0}
+  maxStoredGrenades: 3
+  useLastStoredFirst: 1
   pickupRadius: 0.25
   grenadePickupMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  dropOffset: {x: 0, y: -0.05, z: 0.2}
-  dropForce: 0.5
   throwForwardOffset: 0.12
   throwForce: 8
   throwUpForce: 1.5
