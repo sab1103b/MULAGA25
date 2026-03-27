@@ -98,7 +98,7 @@ public class WeaponEquipRightVR : MonoBehaviour
     private void EquipWeapon()
     {
         isEquipped = true;
-
+        ConsejeroManager.Instance.EventoRecogeArma();
         if (floatingVisual != null)
             floatingVisual.NotifyPickedUp();
 
