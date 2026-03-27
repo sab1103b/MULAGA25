@@ -30,6 +30,7 @@ public class CollectionManager : MonoBehaviour
         {
             collectedFolletos.Add(id);
             Debug.Log("Folleto agregado: " + id);
+            ConsejeroManager.Instance.EventoColeccionable();
         }
     }
 

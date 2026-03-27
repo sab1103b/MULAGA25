@@ -16,7 +16,7 @@ public class ConsejeroManager : MonoBehaviour
     public string textoInicio;
 
     [TextArea(3,5)]
-    public string textoDrop;
+    public string Textochoque;
 
     [TextArea(3,5)]
     public string textoColeccionable;
@@ -24,15 +24,23 @@ public class ConsejeroManager : MonoBehaviour
     [TextArea(3,5)]
     public string textoBoss;
 
+    [TextArea(3, 5)]
+    public string textoarma;
+
+    [TextArea(3, 5)]
+    public string textonivel;
+
     [Header("Configuración")]
     public float velocidadTexto = 0.03f;
     public float duracionMensaje = 5f;
 
     
     bool yaMostroInicio = false;
-    bool yaMostroDrop = false;
+    bool yaMostroChoque = false;
     bool yaMostroColeccionable = false;
     bool yaMostroBoss = false;
+    bool YaRecogeelarma = false;
+    bool Entraalnivel = false;
 
     void Awake()
     {
@@ -49,6 +57,7 @@ public class ConsejeroManager : MonoBehaviour
     public void MostrarMensaje(string mensaje)
     {
         StopAllCoroutines();
+        gameObject.SetActive(true);
         StartCoroutine(MostrarMensajeCoroutine(mensaje));
     }
 
@@ -80,12 +89,12 @@ public class ConsejeroManager : MonoBehaviour
         MostrarMensaje(textoInicio);
     }
 
-    public void EventoDrop()
+    public void EventoChoque()
     {
-        if (yaMostroDrop) return;
+        if (yaMostroChoque) return;
 
-        yaMostroDrop = true;
-        MostrarMensaje(textoDrop);
+        yaMostroChoque = true;
+        MostrarMensaje(Textochoque);
     }
 
     public void EventoColeccionable()
@@ -102,5 +111,19 @@ public class ConsejeroManager : MonoBehaviour
 
         yaMostroBoss = true;
         MostrarMensaje(textoBoss);
+    }
+
+    public void EventoRecogeArma()
+    {
+        if (YaRecogeelarma) return;
+        YaRecogeelarma = true;
+        MostrarMensaje(textoarma);
+    }
+
+    public void EventoEntraNivel()
+    {
+        if (Entraalnivel) return;
+        Entraalnivel = true;
+        MostrarMensaje(textonivel);
     }
 }

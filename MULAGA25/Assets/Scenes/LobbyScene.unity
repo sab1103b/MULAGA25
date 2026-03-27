@@ -600,7 +600,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5289182684458692542, guid: e5db301629853dd4a99835fa70099d79, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_StringArgument
-      value: Level_01
+      value: Level_02
       objectReference: {fileID: 0}
     - target: {fileID: 5289182684458692542, guid: e5db301629853dd4a99835fa70099d79, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
@@ -1596,7 +1596,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VRLevelButton
   levelNumber: 2
-  sceneName: Level_01
+  sceneName: Level_02
 --- !u!1 &749998092
 GameObject:
   m_ObjectHideFlags: 0
@@ -3787,9 +3787,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e8fdbd73b9aa2347abb0b1144b61c64, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerModel
+  hud: {fileID: 0}
   maxLives: 3
   currentLives: 0
+  isDead: 0
   posterFragments: 0
+  deathCanvas: {fileID: 0}
+  playerCamera: {fileID: 0}
 --- !u!114 &1554501040
 MonoBehaviour:
   m_ObjectHideFlags: 0
