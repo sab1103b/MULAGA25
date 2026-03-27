@@ -600,7 +600,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5289182684458692542, guid: e5db301629853dd4a99835fa70099d79, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_StringArgument
-      value: LoadingScene
+      value: Level_01
       objectReference: {fileID: 0}
     - target: {fileID: 5289182684458692542, guid: e5db301629853dd4a99835fa70099d79, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
@@ -1002,6 +1002,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::StartGame
   fade: {fileID: 332232521}
   sceneToLoad: LoadingScene
+  defaultScene: Level_01
 --- !u!65 &332232523
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1296,7 +1297,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VRLevelButton
   levelNumber: 1
-  sceneName: Level_01
+  sceneName: LoadingScene
 --- !u!1 &627000166
 GameObject:
   m_ObjectHideFlags: 0
@@ -1594,8 +1595,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5557522ef7a377a4393cf5788d921a5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VRLevelButton
-  levelNumber: 1
-  sceneName: LoadingScene
+  levelNumber: 2
+  sceneName: Level_01
 --- !u!1 &749998092
 GameObject:
   m_ObjectHideFlags: 0
@@ -4123,7 +4124,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 732877344778758184, guid: fd28f23af44f73f4a95e33435872ad15, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_StringArgument
-      value: Level_01
+      value: LoadingScene
       objectReference: {fileID: 0}
     - target: {fileID: 732877344778758184, guid: fd28f23af44f73f4a95e33435872ad15, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
@@ -4899,7 +4900,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5557522ef7a377a4393cf5788d921a5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VRLevelButton
-  levelNumber: 1
+  levelNumber: 3
   sceneName: BasicScene
 --- !u!1001 &1783135900
 PrefabInstance:

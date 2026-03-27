@@ -1,9 +1,11 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class StartGame : MonoBehaviour
 {
     public FadeController fade;
+
     public string sceneToLoad;
+    public string defaultScene = "Level_01";
 
     public void SetLevel(string sceneName)
     {
@@ -11,12 +13,15 @@ public class StartGame : MonoBehaviour
         Debug.Log("Nivel seleccionado: " + sceneToLoad);
     }
 
-
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("MainCamera") && !string.IsNullOrEmpty(sceneToLoad))
+        if (other.CompareTag("MainCamera"))
         {
-            StartCoroutine(fade.FadeOut(sceneToLoad));
+            string levelToLoad = string.IsNullOrEmpty(sceneToLoad)
+                ? defaultScene
+                : sceneToLoad;
+
+            StartCoroutine(fade.FadeOut(levelToLoad));
         }
     }
 }
