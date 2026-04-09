@@ -3,6 +3,15 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class FloatingVisual : MonoBehaviour
 {
+    public enum FloatingMode
+    {
+        Pickup,   
+        Ambient   
+    }
+
+    [Header("Modo")]
+    public FloatingMode mode = FloatingMode.Pickup;
+
     [Header("Hover sobre superficie")]
     [SerializeField] private float hoverHeight = 0.08f;
     [SerializeField] private float floatAmplitude = 0.015f;
@@ -10,7 +19,7 @@ public class FloatingVisual : MonoBehaviour
     [SerializeField] private float groundCheckDistance = 2f;
     [SerializeField] private LayerMask groundMask = ~0;
 
-    [Header("Activación")]
+    [Header("Activación (solo Pickup)")]
     [SerializeField] private float activationDelay = 0.25f;
     [SerializeField] private float settleLinearSpeed = 0.15f;
     [SerializeField] private float settleAngularSpeed = 0.15f;
@@ -35,11 +44,34 @@ public class FloatingVisual : MonoBehaviour
         currentYaw = transform.eulerAngles.y;
     }
 
+    private void Start()
+    {
+        if (mode == FloatingMode.Ambient)
+        {
+            // Activar directamente modo hover sin física
+            effectEnabled = true;
+            hoverMode = true;
+
+            if (rb != null)
+            {
+                rb.useGravity = false;
+                rb.isKinematic = true;
+            }
+        }
+    }
+
     private void Update()
     {
-        if (!effectEnabled)
+        if (!effectEnabled && mode == FloatingMode.Pickup)
             return;
 
+        if (mode == FloatingMode.Ambient)
+        {
+            UpdateHoverMode();
+            return;
+        }
+
+        // --- MODO PICKUP (tu lógica original) ---
         if (hoverMode)
         {
             UpdateHoverMode();
@@ -83,21 +115,24 @@ public class FloatingVisual : MonoBehaviour
 
     private void UpdateHoverMode()
     {
-        if (!TryGetGround(out RaycastHit hit))
-        {
-            ExitHoverToPhysics();
-            return;
-        }
-
         float yOffset = hoverHeight +
-                        Mathf.Sin((Time.time + phaseOffset) * floatFrequency * Mathf.PI * 2f) * floatAmplitude;
+            Mathf.Sin((Time.time + phaseOffset) * floatFrequency * Mathf.PI * 2f) * floatAmplitude;
 
         Vector3 p = transform.position;
-        p.y = hit.point.y + yOffset;
+
+        if (TryGetGround(out RaycastHit hit))
+        {
+            p.y = hit.point.y + yOffset;
+        }
+        else if (mode == FloatingMode.Ambient)
+        {
+            // En modo ambient no depende del suelo
+            p.y += Mathf.Sin(Time.time * floatFrequency) * floatAmplitude * Time.deltaTime;
+        }
+
         transform.position = p;
 
-        currentYaw += rotationSpeed * Time.deltaTime;
-        transform.rotation = Quaternion.Euler(0f, currentYaw, 0f);
+        transform.Rotate(Vector3.up, rotationSpeed * Time.deltaTime, Space.Self);
     }
 
     private bool TryGetGround(out RaycastHit bestHit)
@@ -135,6 +170,8 @@ public class FloatingVisual : MonoBehaviour
 
     private void ExitHoverToPhysics()
     {
+        if (mode == FloatingMode.Ambient) return;
+
         hoverMode = false;
         waitingForSettle = true;
         enableTime = Time.time;
@@ -148,6 +185,8 @@ public class FloatingVisual : MonoBehaviour
 
     public void NotifyPickedUp()
     {
+        if (mode == FloatingMode.Ambient) return;
+
         effectEnabled = false;
         waitingForSettle = false;
         hoverMode = false;
@@ -163,6 +202,8 @@ public class FloatingVisual : MonoBehaviour
 
     public void NotifyDropped()
     {
+        if (mode == FloatingMode.Ambient) return;
+
         effectEnabled = true;
         waitingForSettle = true;
         hoverMode = false;
@@ -178,6 +219,8 @@ public class FloatingVisual : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
+        if (mode == FloatingMode.Ambient) return;
+
         if (!effectEnabled)
             return;
 
