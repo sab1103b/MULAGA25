@@ -3,7 +3,32 @@ guid: 50fb040f8c2c20e43b04e4173d970449
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Cilindro_3
+    second: {fileID: 2100000, guid: ce9eb73aa10b3b34888cf36935a23b46, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Cilindro_4
+    second: {fileID: 2100000, guid: 465190bb515acbf4f8e390937c45f683, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Cilindro_6
+    second: {fileID: 2100000, guid: 1ad1416cc31f60f45b3fa337bcec8030, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Cilindro_7
+    second: {fileID: 2100000, guid: d630a4b084605ed49a8c3cb75b75302e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Textura_cilindro_2
+    second: {fileID: 2100000, guid: 09aaa396c0a22c94aab0c21cef09b4f3, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
