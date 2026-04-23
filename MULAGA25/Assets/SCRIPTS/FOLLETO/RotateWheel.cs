@@ -48,7 +48,7 @@ public class FolletoWheel : MonoBehaviour
             target.y = folletos[i].transform.position.y;
 
             folletos[i].transform.LookAt(target);
-            folletos[i].transform.Rotate(0, 90, 90);
+            folletos[i].transform.Rotate(90, 90, 90);
         }
     }
 
