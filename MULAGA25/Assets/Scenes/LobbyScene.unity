@@ -2062,63 +2062,6 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 442605361}
   m_SourcePrefab: {fileID: 100100000, guid: cf7f7bb9bc4f92e4faf4d321132f14be, type: 3}
---- !u!1001 &998601325
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 6598815579406187027, guid: 18ddb545287c546e19cc77dc9fbb2189, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 1.25675
-      objectReference: {fileID: 0}
-    - target: {fileID: 6598815579406187027, guid: 18ddb545287c546e19cc77dc9fbb2189, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6598815579406187027, guid: 18ddb545287c546e19cc77dc9fbb2189, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 1.25675
-      objectReference: {fileID: 0}
-    - target: {fileID: 6598815579406187027, guid: 18ddb545287c546e19cc77dc9fbb2189, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6598815579406187027, guid: 18ddb545287c546e19cc77dc9fbb2189, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6598815579406187027, guid: 18ddb545287c546e19cc77dc9fbb2189, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6598815579406187027, guid: 18ddb545287c546e19cc77dc9fbb2189, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6598815579406187027, guid: 18ddb545287c546e19cc77dc9fbb2189, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6598815579406187027, guid: 18ddb545287c546e19cc77dc9fbb2189, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6598815579406187027, guid: 18ddb545287c546e19cc77dc9fbb2189, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6598815579406187037, guid: 18ddb545287c546e19cc77dc9fbb2189, type: 3}
-      propertyPath: m_Name
-      value: XR Device Simulator
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 18ddb545287c546e19cc77dc9fbb2189, type: 3}
 --- !u!1 &1080417981
 GameObject:
   m_ObjectHideFlags: 0
@@ -2972,22 +2915,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 344898f2fbda0be419c9e86a204b18a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LeftHandGrenadeController
-  leftGrenadeSocket: {fileID: 749998093}
+  currentMode: 0
+  leftHandSocket: {fileID: 0}
   grenadeStorageSocket: {fileID: 0}
+  shieldStorageSocket: {fileID: 0}
   pickupCheckPoint: {fileID: 52034329}
   leftControllerVisual: {fileID: 1757554460}
-  pickupAction: {fileID: 2334944386246163597, guid: 760037ff4eac6804dae76d1187d56d2b, type: 3}
-  useGrenadeAction: {fileID: 0}
+  gripAction: {fileID: 0}
+  triggerAction: {fileID: 0}
+  cycleModeAction: {fileID: 0}
   maxStoredGrenades: 3
+  maxStoredShields: 3
   useLastStoredFirst: 1
   pickupRadius: 0.25
-  grenadePickupMask:
+  pickupMask:
     serializedVersion: 2
     m_Bits: 4294967295
   throwForwardOffset: 0.12
   throwForce: 8
   throwUpForce: 1.5
   spinForce: 8
+  modeIndicatorText: {fileID: 0}
+  grenadeIndicatorUI: {fileID: 0}
+  shieldIndicatorUI: {fileID: 0}
 --- !u!114 &1171746554
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5973,7 +5923,6 @@ SceneRoots:
   - {fileID: 332232526}
   - {fileID: 1842172618}
   - {fileID: 978792421}
-  - {fileID: 998601325}
   - {fileID: 1206358998}
   - {fileID: 1752786369}
   - {fileID: 1126974349}
