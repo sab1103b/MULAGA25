@@ -658,7 +658,7 @@ MonoBehaviour:
   - {fileID: 1645495229}
   - {fileID: 503192438}
   radius: 6
-  rotationSpeed: 100
+  rotationSpeed: 30
   hologramMaterial: {fileID: 2100000, guid: 902849a996fe7db40a3c2e4ec7fda5cf, type: 2}
 --- !u!1001 &395035494
 PrefabInstance:
@@ -1941,9 +1941,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e8fdbd73b9aa2347abb0b1144b61c64, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerModel
+  hud: {fileID: 0}
   maxLives: 3
   currentLives: 0
+  isDead: 0
   posterFragments: 0
+  deathCanvas: {fileID: 0}
+  playerCamera: {fileID: 0}
 --- !u!114 &1616822421
 MonoBehaviour:
   m_ObjectHideFlags: 0

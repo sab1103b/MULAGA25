@@ -2,56 +2,53 @@ using UnityEngine;
 
 public class FolletoWheel : MonoBehaviour
 {
-    public Transform player;          
-    public GameObject[] folletos;     
+    public Transform player;
+    public GameObject[] folletos;
 
-    public float radius = 3f;         
+    public float radius = 3f;
     public float rotationSpeed = 20f;
 
     public Material hologramMaterial;
 
+    private float currentRotation = 0f;
+
     void Start()
     {
-        PositionFolletos();
         CheckUnlocked();
     }
 
     void Update()
     {
-        if (player == null) return;
+        if (player == null || folletos.Length == 0) return;
 
-        // la rueda sigue siempre la posición del jugador
-        transform.position = player.position;
-
-        transform.Rotate(0, rotationSpeed * Time.deltaTime, 0);
-
-        // los folletos siempre miran al jugador
-        foreach (GameObject folleto in folletos)
-        {
-            if (folleto == null) continue;
-
-            folleto.transform.LookAt(player);
-            folleto.transform.Rotate(0, 90, 90);
-        }
-    }
-
-    void PositionFolletos()
-    {
-        if (folletos.Length == 0) return;
+        // acumulamos rotación global
+        currentRotation += rotationSpeed * Time.deltaTime;
 
         float angleStep = 360f / folletos.Length;
 
         for (int i = 0; i < folletos.Length; i++)
         {
-            float angle = i * angleStep * Mathf.Deg2Rad;
+            if (folletos[i] == null) continue;
+
+            // -------------------------------
+            // POSICIÓN EN CÍRCULO (alrededor del jugador)
+            // -------------------------------
+            float angle = (i * angleStep + currentRotation) * Mathf.Deg2Rad;
 
             float x = Mathf.Cos(angle) * radius;
             float z = Mathf.Sin(angle) * radius;
 
-            Vector3 pos = new Vector3(x, 1f, z);
+            Vector3 worldPos = player.position + new Vector3(x, 1f, z);
+            folletos[i].transform.position = worldPos;
 
-            folletos[i].transform.SetParent(transform);
-            folletos[i].transform.localPosition = pos;
+            // -------------------------------
+            // ROTACIÓN: mirar al jugador (solo eje Y)
+            // -------------------------------
+            Vector3 target = player.position;
+            target.y = folletos[i].transform.position.y;
+
+            folletos[i].transform.LookAt(target);
+            folletos[i].transform.Rotate(0, 90, 90);
         }
     }
 
