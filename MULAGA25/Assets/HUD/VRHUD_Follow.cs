@@ -4,20 +4,43 @@ public class VRHUD_Follow : MonoBehaviour
 {
     public Transform cameraTransform;
 
+    [Header("Distancia y posición")]
+    public Vector3 offset = new Vector3(0f, 0f, 0.33f);
+
+    [Header("Suavizado")]
+    public float positionSmooth = 10f;
+    public float rotationSmooth = 12f;
+
     void Start()
     {
-        cameraTransform = Camera.main.transform;
+        if (!cameraTransform)
+            cameraTransform = Camera.main.transform;
     }
 
     void LateUpdate()
     {
         if (!cameraTransform) return;
 
-        transform.position = cameraTransform.position + cameraTransform.forward * 1.8f;
+        // -------------------------------
+        // POSICIÓN OBJETIVO
+        // -------------------------------
+        Vector3 targetPosition = cameraTransform.position + cameraTransform.TransformDirection(offset);
 
-        Vector3 lookPos = cameraTransform.position;
-        lookPos.y = transform.position.y;
+        transform.position = Vector3.Lerp(
+            transform.position,
+            targetPosition,
+            positionSmooth * Time.deltaTime
+        );
 
-        transform.LookAt(lookPos);
+        // -------------------------------
+        // ROTACIÓN CORRECTA (alineada con la cámara)
+        // -------------------------------
+        Quaternion targetRotation = Quaternion.LookRotation(cameraTransform.forward, Vector3.up);
+
+        transform.rotation = Quaternion.Slerp(
+            transform.rotation,
+            targetRotation,
+            rotationSmooth * Time.deltaTime
+        );
     }
 }
