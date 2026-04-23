@@ -13,5 +13,6 @@ public class LoadtoLV : MonoBehaviour
     {
         yield return new WaitForSeconds(10f);
         StartCoroutine(fade.FadeOut("Level_01"));
+
     }
 }
