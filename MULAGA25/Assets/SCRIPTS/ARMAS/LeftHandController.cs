@@ -2,157 +2,230 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class LeftHandGrenadeController : MonoBehaviour
+public class LeftHandThrowableController : MonoBehaviour
 {
-    [Header("Referencias")]
-    [SerializeField] private Transform leftGrenadeSocket;
-    [SerializeField] private Transform grenadeStorageSocket;
-    [SerializeField] private Transform pickupCheckPoint;
-    [SerializeField] private GameObject leftControllerVisual;
+    // ── Modo actual ────────────────────────────────────────────
+    public enum ThrowMode { Grenade, Shield }
 
-    [Header("Input")]
-    [SerializeField] private InputActionReference pickupAction;       // Recoger y guardar
-    [SerializeField] private InputActionReference useGrenadeAction;   // Si no hay granada en mano: equipa. Si ya hay: lanza.
+    [Header("─── Modo actual ───────────────────────────────────")]
+    [SerializeField] private ThrowMode currentMode = ThrowMode.Grenade;
 
-    [Header("Inventario")]
+    // ── Referencias ────────────────────────────────────────────
+    [Header("─── Sockets ─────────────────────────────────────────")]
+    [SerializeField] private Transform leftHandSocket;          // Donde aparece el objeto en la mano
+    [SerializeField] private Transform grenadeStorageSocket;    // Donde se guardan visualmente las granadas
+    [SerializeField] private Transform shieldStorageSocket;     // Donde se guardan visualmente los escudos
+    [SerializeField] private Transform pickupCheckPoint;        // Centro del overlap de recogida
+    [SerializeField] private GameObject leftControllerVisual;   // Mesh del control izquierdo
+
+    // ── Input ──────────────────────────────────────────────────
+    [Header("─── Input ───────────────────────────────────────────")]
+    [SerializeField] private InputActionReference gripAction;       // Recoger objeto (Grip)
+    [SerializeField] private InputActionReference triggerAction;    // Equipar / Lanzar (Trigger)
+    [SerializeField] private InputActionReference cycleModeAction;  // Ciclar modo (Botón Y)
+
+    // ── Inventario ─────────────────────────────────────────────
+    [Header("─── Inventario ─────────────────────────────────────")]
     [SerializeField] private int maxStoredGrenades = 3;
-    [SerializeField] private bool useLastStoredFirst = true; // true = última en entrar, primera en salir
+    [SerializeField] private int maxStoredShields = 3;
+    [SerializeField] private bool useLastStoredFirst = true;
 
-    [Header("Detección")]
-    [SerializeField] private float pickupRadius = 0.2f;
-    [SerializeField] private LayerMask grenadePickupMask = ~0;
+    // ── Detección de recogida ──────────────────────────────────
+    [Header("─── Pickup ──────────────────────────────────────────")]
+    [SerializeField] private float pickupRadius = 0.25f;
+    [SerializeField] private LayerMask pickupMask = ~0;
 
-    [Header("Lanzar")]
+    // ── Parámetros de lanzamiento ──────────────────────────────
+    [Header("─── Lanzamiento ─────────────────────────────────────")]
     [SerializeField] private float throwForwardOffset = 0.12f;
     [SerializeField] private float throwForce = 8f;
     [SerializeField] private float throwUpForce = 1.5f;
     [SerializeField] private float spinForce = 8f;
 
-    private readonly List<GrenadePickupItem> storedGrenades = new List<GrenadePickupItem>();
-    private GrenadePickupItem equippedGrenade;
+    // ── UI / Feedback ──────────────────────────────────────────
+    [Header("─── UI Feedback (opcional) ──────────────────────────")]
+    [SerializeField] private TMPro.TextMeshProUGUI modeIndicatorText; // Texto que muestra el modo
+    [SerializeField] private GameObject grenadeIndicatorUI;
+    [SerializeField] private GameObject shieldIndicatorUI;
+
+    // ── Estado interno ─────────────────────────────────────────
+    private readonly List<GrenadeItem> storedGrenades = new List<GrenadeItem>();
+    private readonly List<ShieldBombItem> storedShields = new List<ShieldBombItem>();
+
+    private ThrowableItem equippedItem;   // El item actualmente en la mano
+
+    // ══════════════════════════════════════════════════════════════
+    //   Unity Lifecycle
+    // ══════════════════════════════════════════════════════════════
 
     private void Start()
     {
+        RefreshUI();
         UpdateControllerVisual();
     }
 
     private void OnEnable()
     {
-        EnableAction(pickupAction);
-        EnableAction(useGrenadeAction);
+        EnableAction(gripAction);
+        EnableAction(triggerAction);
+        EnableAction(cycleModeAction);
     }
 
     private void OnDisable()
     {
-        DisableAction(pickupAction);
-        DisableAction(useGrenadeAction);
+        DisableAction(gripAction);
+        DisableAction(triggerAction);
+        DisableAction(cycleModeAction);
     }
 
     private void Update()
     {
-        CleanupStoredGrenades();
-
-        HandlePickupAndStore();
-        HandleUseGrenade();
+        CleanupLists();
+        HandleCycleMode();
+        HandleGrip();
+        HandleTrigger();
     }
 
-    private void HandlePickupAndStore()
+    // ══════════════════════════════════════════════════════════════
+    //   Input Handlers
+    // ══════════════════════════════════════════════════════════════
+
+    /// <summary>
+    /// Botón Y: Cicla entre Grenade y Shield.
+    /// Solo funciona si NO hay un objeto en la mano.
+    /// </summary>
+    private void HandleCycleMode()
     {
-        if (!PressedThisFrame(pickupAction)) return;
-        if (equippedGrenade != null) return;
-        if (storedGrenades.Count >= maxStoredGrenades) return;
+        if (!PressedThisFrame(cycleModeAction)) return;
+        if (equippedItem != null) return; // No cambia de modo con algo en la mano
 
-        GrenadePickupItem nearest = FindNearestGrenadePickup();
-        if (nearest == null) return;
-        if (storedGrenades.Contains(nearest)) return;
+        currentMode = currentMode == ThrowMode.Grenade
+            ? ThrowMode.Shield
+            : ThrowMode.Grenade;
 
-        storedGrenades.Add(nearest);
-        nearest.StoreTo(GetStorageSocket());
-
-        UpdateControllerVisual();
-
-        Debug.Log("Granadas guardadas: " + storedGrenades.Count + "/" + maxStoredGrenades);
+        RefreshUI();
+        Debug.Log($"[ThrowController] Modo cambiado a: {currentMode}");
     }
 
-    private void HandleUseGrenade()
+    /// <summary>
+    /// Grip: Recoge el objeto más cercano del tipo del modo actual.
+    /// </summary>
+    private void HandleGrip()
     {
-        if (!PressedThisFrame(useGrenadeAction)) return;
+        if (!PressedThisFrame(gripAction)) return;
+        if (equippedItem != null) return; // No recoge si ya tiene algo en mano
 
-        // Si ya hay una granada en la mano, este mismo botón la lanza.
-        if (equippedGrenade != null)
+        switch (currentMode)
         {
-            equippedGrenade.ThrowFrom(transform, throwForwardOffset, throwForce, throwUpForce, spinForce);
-            equippedGrenade = null;
+            case ThrowMode.Grenade:
+                if (storedGrenades.Count >= maxStoredGrenades) return;
+                TryPickup<GrenadeItem>(storedGrenades, maxStoredGrenades, grenadeStorageSocket);
+                break;
 
+            case ThrowMode.Shield:
+                if (storedShields.Count >= maxStoredShields) return;
+                TryPickup<ShieldBombItem>(storedShields, maxStoredShields, shieldStorageSocket);
+                break;
+        }
+
+        RefreshUI();
+    }
+
+    /// <summary>
+    /// Trigger:
+    ///   - Si hay item en mano → lanza.
+    ///   - Si no hay item en mano → equipa uno del inventario (según modo).
+    /// </summary>
+    private void HandleTrigger()
+    {
+        if (!PressedThisFrame(triggerAction)) return;
+
+        // ── Si hay algo en la mano, lanzar ──
+        if (equippedItem != null)
+        {
+            equippedItem.ThrowFrom(
+                leftHandSocket != null ? leftHandSocket : transform,
+                throwForwardOffset, throwForce, throwUpForce, spinForce
+            );
+            equippedItem = null;
             UpdateControllerVisual();
-
-            Debug.Log("Granada lanzada. Restantes: " + storedGrenades.Count + "/" + maxStoredGrenades);
+            RefreshUI();
             return;
         }
 
-        // Si no hay granada en mano, este botón saca una del inventario.
-        if (storedGrenades.Count == 0) return;
-        if (leftGrenadeSocket == null) return;
-
-        int index = useLastStoredFirst ? storedGrenades.Count - 1 : 0;
-
-        equippedGrenade = storedGrenades[index];
-        storedGrenades.RemoveAt(index);
-
-        if (equippedGrenade == null)
+        // ── Si no hay nada, equipar según modo ──
+        switch (currentMode)
         {
-            equippedGrenade = null;
-            return;
+            case ThrowMode.Grenade:
+                EquipFromList(storedGrenades);
+                break;
+            case ThrowMode.Shield:
+                EquipFromList(storedShields);
+                break;
         }
-
-        equippedGrenade.EquipTo(leftGrenadeSocket);
 
         UpdateControllerVisual();
-
-        Debug.Log("Granada equipada. Restantes en inventario: " + storedGrenades.Count + "/" + maxStoredGrenades);
+        RefreshUI();
     }
 
-    private Transform GetStorageSocket()
+    // ══════════════════════════════════════════════════════════════
+    //   Lógica de Pickup / Equip
+    // ══════════════════════════════════════════════════════════════
+
+    private void TryPickup<T>(List<T> list, int max, Transform storageSocket)
+        where T : ThrowableItem
     {
-        return grenadeStorageSocket != null ? grenadeStorageSocket : transform;
+        if (list.Count >= max) return;
+
+        T nearest = FindNearest<T>();
+        if (nearest == null) return;
+        if (list.Contains(nearest)) return;
+
+        list.Add(nearest);
+        nearest.StoreTo(storageSocket != null ? storageSocket : transform);
+
+        Debug.Log($"[ThrowController] Recogido {typeof(T).Name}. " +
+                  $"Guardados: {list.Count}/{max}");
     }
 
-    private void UpdateControllerVisual()
+    private void EquipFromList<T>(List<T> list) where T : ThrowableItem
     {
-        // Si hay granada visible en la mano, ocultamos el control.
-        if (leftControllerVisual != null)
-            leftControllerVisual.SetActive(equippedGrenade == null);
+        if (list.Count == 0) return;
+        if (leftHandSocket == null) return;
+
+        int index = useLastStoredFirst ? list.Count - 1 : 0;
+        T item = list[index];
+        list.RemoveAt(index);
+
+        if (item == null) return;
+
+        equippedItem = item;
+        equippedItem.EquipTo(leftHandSocket);
+
+        Debug.Log($"[ThrowController] Equipado {typeof(T).Name}. " +
+                  $"Restantes: {list.Count}");
     }
 
-    private void CleanupStoredGrenades()
-    {
-        for (int i = storedGrenades.Count - 1; i >= 0; i--)
-        {
-            if (storedGrenades[i] == null)
-                storedGrenades.RemoveAt(i);
-        }
-    }
-
-    private GrenadePickupItem FindNearestGrenadePickup()
+    private T FindNearest<T>() where T : ThrowableItem
     {
         if (pickupCheckPoint == null) return null;
 
         Collider[] hits = Physics.OverlapSphere(
-            pickupCheckPoint.position,
-            pickupRadius,
-            grenadePickupMask,
-            QueryTriggerInteraction.Collide
-        );
+            pickupCheckPoint.position, pickupRadius, pickupMask,
+            QueryTriggerInteraction.Collide);
 
-        GrenadePickupItem nearest = null;
+        T nearest = null;
         float bestDist = float.MaxValue;
 
         foreach (Collider hit in hits)
         {
-            GrenadePickupItem item = hit.GetComponentInParent<GrenadePickupItem>();
+            T item = hit.GetComponentInParent<T>();
             if (item == null) continue;
-            if (item == equippedGrenade) continue;
-            if (storedGrenades.Contains(item)) continue;
+            if ((ThrowableItem)item == equippedItem) continue;
+
+            // Evita duplicados en listas
+            if (item is GrenadeItem gi && storedGrenades.Contains(gi)) continue;
+            if (item is ShieldBombItem si && storedShields.Contains(si)) continue;
 
             float dist = Vector3.Distance(pickupCheckPoint.position, item.transform.position);
             if (dist < bestDist)
@@ -165,50 +238,87 @@ public class LeftHandGrenadeController : MonoBehaviour
         return nearest;
     }
 
-    private bool PressedThisFrame(InputActionReference actionRef)
+    // ══════════════════════════════════════════════════════════════
+    //   Mantenimiento de listas
+    // ══════════════════════════════════════════════════════════════
+
+    private void CleanupLists()
     {
-        return actionRef != null &&
-               actionRef.action != null &&
-               actionRef.action.WasPressedThisFrame();
+        for (int i = storedGrenades.Count - 1; i >= 0; i--)
+            if (storedGrenades[i] == null) storedGrenades.RemoveAt(i);
+
+        for (int i = storedShields.Count - 1; i >= 0; i--)
+            if (storedShields[i] == null) storedShields.RemoveAt(i);
+
+        if (equippedItem != null && equippedItem.gameObject == null)
+            equippedItem = null;
     }
 
-    private void EnableAction(InputActionReference actionRef)
+    // ══════════════════════════════════════════════════════════════
+    //   UI / Visual
+    // ══════════════════════════════════════════════════════════════
+
+    private void UpdateControllerVisual()
     {
-        if (actionRef != null && actionRef.action != null)
-            actionRef.action.Enable();
+        if (leftControllerVisual != null)
+            leftControllerVisual.SetActive(equippedItem == null);
     }
 
-    private void DisableAction(InputActionReference actionRef)
+    private void RefreshUI()
     {
-        if (actionRef != null && actionRef.action != null)
-            actionRef.action.Disable();
+        if (modeIndicatorText != null)
+        {
+            string icon = currentMode == ThrowMode.Grenade ? "💣" : "🛡";
+            int count = currentMode == ThrowMode.Grenade
+                ? storedGrenades.Count
+                : storedShields.Count;
+            int max = currentMode == ThrowMode.Grenade
+                ? maxStoredGrenades
+                : maxStoredShields;
+
+            modeIndicatorText.text = $"{icon} {currentMode}  [{count}/{max}]";
+        }
+
+        if (grenadeIndicatorUI != null)
+            grenadeIndicatorUI.SetActive(currentMode == ThrowMode.Grenade);
+        if (shieldIndicatorUI != null)
+            shieldIndicatorUI.SetActive(currentMode == ThrowMode.Shield);
     }
 
-    public bool HasStoredGrenades()
+    // ══════════════════════════════════════════════════════════════
+    //   API Pública
+    // ══════════════════════════════════════════════════════════════
+
+    public ThrowMode GetCurrentMode() => currentMode;
+    public bool HasItemInHand() => equippedItem != null;
+    public int GetStoredGrenades() => storedGrenades.Count;
+    public int GetStoredShields() => storedShields.Count;
+
+    // ══════════════════════════════════════════════════════════════
+    //   Helpers Input
+    // ══════════════════════════════════════════════════════════════
+
+    private bool PressedThisFrame(InputActionReference r) =>
+        r != null && r.action != null && r.action.WasPressedThisFrame();
+
+    private void EnableAction(InputActionReference r)
     {
-        return storedGrenades.Count > 0;
+        if (r != null && r.action != null) r.action.Enable();
     }
 
-    public bool HasGrenadeInHand()
+    private void DisableAction(InputActionReference r)
     {
-        return equippedGrenade != null;
+        if (r != null && r.action != null) r.action.Disable();
     }
 
-    public int GetStoredGrenadeCount()
-    {
-        return storedGrenades.Count;
-    }
-
-    public int GetMaxStoredGrenades()
-    {
-        return maxStoredGrenades;
-    }
+    // ══════════════════════════════════════════════════════════════
+    //   Gizmos
+    // ══════════════════════════════════════════════════════════════
 
     private void OnDrawGizmosSelected()
     {
         if (pickupCheckPoint == null) return;
-
-        Gizmos.color = Color.cyan;
+        Gizmos.color = currentMode == ThrowMode.Grenade ? Color.yellow : Color.cyan;
         Gizmos.DrawWireSphere(pickupCheckPoint.position, pickupRadius);
     }
 }
