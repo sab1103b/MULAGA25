@@ -5,14 +5,15 @@ TagManager:
   serializedVersion: 3
   tags:
   - Anchor
+  - Enemy
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - groundLayer
   - Water
   - UI
-  - 
+  - Obstacle
   - 
   - 
   - 
