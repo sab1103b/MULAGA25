@@ -15302,6 +15302,14 @@ PrefabInstance:
       value: 0.53
       objectReference: {fileID: 0}
     - target: {fileID: 3523603703463079671, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: positionSmooth
+      value: 40
+      objectReference: {fileID: 0}
+    - target: {fileID: 3523603703463079671, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: rotationSmooth
+      value: 40
+      objectReference: {fileID: 0}
+    - target: {fileID: 3523603703463079671, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
       propertyPath: cameraTransform
       value: 
       objectReference: {fileID: 1424364816}
