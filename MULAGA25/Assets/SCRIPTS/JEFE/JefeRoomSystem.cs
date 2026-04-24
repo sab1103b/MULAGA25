@@ -7,7 +7,7 @@ public class JefeRoomSystem : MonoBehaviour
     public Transform orbe2;
     public Transform orbe3;
 
-    [Header("Llaves (zonas)")]
+    [Header("Llaves")]
     public Transform llave1;
     public Transform llave2;
     public Transform llave3;
@@ -20,36 +20,54 @@ public class JefeRoomSystem : MonoBehaviour
     [Header("Detección")]
     public float activationDistance = 0.5f;
 
-    private bool activated = false;
     private Vector3 puertaInitialPos;
-    private Vector3 puertaTargetPos;
+    private Vector3 puertaOpenPos;
+
+    private bool isOpen = false;
+    private bool permanentlyLocked = false;
 
     void Start()
     {
         puertaInitialPos = puerta.position;
-        puertaTargetPos = puertaInitialPos + Vector3.down * doorMoveDistance;
+        puertaOpenPos = puertaInitialPos + Vector3.down * doorMoveDistance;
     }
 
     void Update()
     {
-        if (activated)
+        // SOLO puede abrir si no está bloqueado permanentemente
+        if (!isOpen && !permanentlyLocked)
         {
-            // mover puerta suavemente
+            bool orbe1Correct = Vector3.Distance(orbe1.position, llave1.position) < activationDistance;
+            bool orbe2Correct = Vector3.Distance(orbe2.position, llave2.position) < activationDistance;
+            bool orbe3Correct = Vector3.Distance(orbe3.position, llave3.position) < activationDistance;
+
+            if (orbe1Correct && orbe2Correct && orbe3Correct)
+            {
+                isOpen = true;
+            }
+        }
+
+        if (isOpen)
+        {
             puerta.position = Vector3.Lerp(
                 puerta.position,
-                puertaTargetPos,
+                puertaOpenPos,
                 doorSpeed * Time.deltaTime
             );
-            return;
         }
-
-        bool orbe1Correct = Vector3.Distance(orbe1.position, llave1.position) < activationDistance;
-        bool orbe2Correct = Vector3.Distance(orbe2.position, llave2.position) < activationDistance;
-        bool orbe3Correct = Vector3.Distance(orbe3.position, llave3.position) < activationDistance;
-
-        if (orbe1Correct && orbe2Correct && orbe3Correct)
+        else
         {
-            activated = true;
+            puerta.position = Vector3.Lerp(
+                puerta.position,
+                puertaInitialPos,
+                doorSpeed * Time.deltaTime
+            );
         }
+    }
+
+    public void CerrarPuerta()
+    {
+        isOpen = false;
+        permanentlyLocked = true;
     }
 }
