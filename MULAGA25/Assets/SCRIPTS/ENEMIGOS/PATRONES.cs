@@ -127,7 +127,7 @@ public class PATRONES : MonoBehaviour
                 targetPosition = ZigZag();
                 break;
 
-            case MovementPattern.Rodeo:
+            case MovementPattern.Rodeo: 
                 targetPosition = Rodeo();
                 break;
         }
@@ -207,9 +207,7 @@ public class PATRONES : MonoBehaviour
             diveSide = Random.value < 0.5f ? -1f : 1f;
         }
 
-        // =====================
         // GIRO DE 90°
-        // =====================
 
         if (turning)
         {
@@ -231,9 +229,7 @@ public class PATRONES : MonoBehaviour
             return transform.position;
         }
 
-        // =====================
         // Después del giro
-        // =====================
 
         return transform.position + forwardDir * forwardSpeed * Time.deltaTime;
     }
@@ -347,32 +343,28 @@ public class PATRONES : MonoBehaviour
         Vector3 currentPos = transform.position;
         Vector3 moveDir = targetPosition - currentPos;
 
-        float distance = moveDir.magnitude;
+        float moveDistance = moveDir.magnitude;
 
-        if (distance < 0.001f)
+        if (moveDistance < 0.001f)
             return targetPosition;
 
         moveDir.Normalize();
 
         RaycastHit hit;
 
-        // SphereCast hacia adelante
         if (Physics.SphereCast(currentPos, obstacleRadius, moveDir, out hit, obstacleCheckDistance, obstacleLayer))
         {
-            // Dirección deslizante (proyección sobre la pared)
+            // Dirección deslizante
             Vector3 slideDir = Vector3.ProjectOnPlane(moveDir, hit.normal).normalized;
 
-            // Opcional: evitar quedarse pegado si la proyección es muy pequeña
+            // Si queda muy pequeña, usamos dirección lateral
             if (slideDir.sqrMagnitude < 0.01f)
             {
-                // fallback: moverse ligeramente hacia atrás
                 slideDir = Vector3.Cross(hit.normal, Vector3.up).normalized;
             }
 
-            // Ajustar distancia segura
-            float safeDistance = Mathf.Max(hit.distance - obstacleBuffer, 0f);
-
-            return currentPos + slideDir * safeDistance;
+            // 🔥 CLAVE: mantener la distancia original
+            return currentPos + slideDir * moveDistance;
         }
 
         return targetPosition;
