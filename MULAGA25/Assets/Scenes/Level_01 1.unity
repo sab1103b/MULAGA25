@@ -686,6 +686,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -264430861247414160, guid: e9ab71b21a7b2e5429a4d0e74e7b5d86, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: a5ee73688b4c1f94ea685da96e9ad284, type: 2}
     - target: {fileID: 919132149155446097, guid: e9ab71b21a7b2e5429a4d0e74e7b5d86, type: 3}
       propertyPath: m_Name
       value: Orbe_2
@@ -5006,6 +5010,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -264430861247414160, guid: e9ab71b21a7b2e5429a4d0e74e7b5d86, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: c0ee44958240c2a418f0dd5a7a0d499d, type: 2}
     - target: {fileID: 919132149155446097, guid: e9ab71b21a7b2e5429a4d0e74e7b5d86, type: 3}
       propertyPath: m_Name
       value: Orbe_1
@@ -11746,6 +11754,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 245b85ae32d2ed14697356baefee89d5, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: ebb6d5d89f1e1e74d94437ac3f1f6c77, type: 2}
     - target: {fileID: 919132149155446097, guid: 245b85ae32d2ed14697356baefee89d5, type: 3}
       propertyPath: m_Name
       value: totem_base_1
@@ -14977,6 +14989,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 245b85ae32d2ed14697356baefee89d5, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: c0ee44958240c2a418f0dd5a7a0d499d, type: 2}
     - target: {fileID: 919132149155446097, guid: 245b85ae32d2ed14697356baefee89d5, type: 3}
       propertyPath: m_Name
       value: totem_base_3
@@ -15119,6 +15135,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 245b85ae32d2ed14697356baefee89d5, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: a5ee73688b4c1f94ea685da96e9ad284, type: 2}
     - target: {fileID: 919132149155446097, guid: 245b85ae32d2ed14697356baefee89d5, type: 3}
       propertyPath: m_Name
       value: totem_base_2
