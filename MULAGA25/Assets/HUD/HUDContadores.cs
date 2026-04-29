@@ -8,23 +8,51 @@ public class HUDContadores : MonoBehaviour
     public TextMeshProUGUI textoBombas;
     public TextMeshProUGUI textoEscudos;
 
-    int bombas = 0;
-    int escudos = 0;
+    [Header("Referencia Jugador")]
+    public PlayerModel playerModel;
 
     void Awake()
     {
         Instance = this;
     }
 
+    void Start()
+    {
+        if (playerModel == null)
+            playerModel = FindObjectOfType<PlayerModel>();
+
+        ActualizarHUD();
+    }
+
+    void Update()
+    {
+        ActualizarHUD();
+    }
+
+    public void ActualizarHUD()
+    {
+        if (playerModel == null) return;
+
+        if (textoBombas != null)
+            textoBombas.text = playerModel.currentGrenades.ToString();
+
+        if (textoEscudos != null)
+            textoEscudos.text = playerModel.currentShields.ToString();
+    }
+
     public void AgregarBomba()
     {
-        bombas++;
-        textoBombas.text = bombas.ToString();
+        if (playerModel == null) return;
+
+        playerModel.AddGrenade();
+        ActualizarHUD();
     }
 
     public void AgregarEscudo()
     {
-        escudos++;
-        textoEscudos.text = escudos.ToString();
+        if (playerModel == null) return;
+
+        playerModel.AddShield();
+        ActualizarHUD();
     }
 }

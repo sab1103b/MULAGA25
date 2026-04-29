@@ -6,6 +6,7 @@ public class LeftHandThrowableController : MonoBehaviour
 {
     // ── Modo actual ────────────────────────────────────────────
     public enum ThrowMode { Grenade, Shield }
+    [SerializeField] private PlayerModel playerModel;
 
     [Header("─── Modo actual ───────────────────────────────────")]
     [SerializeField] private ThrowMode currentMode = ThrowMode.Grenade;
@@ -62,6 +63,9 @@ public class LeftHandThrowableController : MonoBehaviour
     {
         RefreshUI();
         UpdateControllerVisual();
+
+        if (playerModel == null)
+            playerModel = FindObjectOfType<PlayerModel>();
     }
 
     private void OnEnable()
@@ -118,12 +122,12 @@ public class LeftHandThrowableController : MonoBehaviour
         switch (currentMode)
         {
             case ThrowMode.Grenade:
-                if (storedGrenades.Count >= maxStoredGrenades) return;
+                if (playerModel.currentGrenades >= playerModel.maxGrenades) return;
                 TryPickup<GrenadeItem>(storedGrenades, maxStoredGrenades, grenadeStorageSocket);
                 break;
 
             case ThrowMode.Shield:
-                if (storedShields.Count >= maxStoredShields) return;
+                if (playerModel.currentShields >= playerModel.maxShields) return;
                 TryPickup<ShieldBombItem>(storedShields, maxStoredShields, shieldStorageSocket);
                 break;
         }
@@ -182,6 +186,13 @@ public class LeftHandThrowableController : MonoBehaviour
         if (list.Contains(nearest)) return;
 
         list.Add(nearest);
+
+        if (typeof(T) == typeof(GrenadeItem))
+            playerModel.AddGrenade();
+
+        if (typeof(T) == typeof(ShieldBombItem))
+            playerModel.AddShield();
+
         nearest.StoreTo(storageSocket != null ? storageSocket : transform);
 
         Debug.Log($"[ThrowController] Recogido {typeof(T).Name}. " +
@@ -196,6 +207,12 @@ public class LeftHandThrowableController : MonoBehaviour
         int index = useLastStoredFirst ? list.Count - 1 : 0;
         T item = list[index];
         list.RemoveAt(index);
+
+        if (typeof(T) == typeof(GrenadeItem))
+            playerModel.UseGrenade();
+
+        if (typeof(T) == typeof(ShieldBombItem))
+            playerModel.UseShield();
 
         if (item == null) return;
 
