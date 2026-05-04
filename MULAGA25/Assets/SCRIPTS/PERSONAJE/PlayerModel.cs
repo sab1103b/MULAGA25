@@ -79,4 +79,32 @@ public class PlayerModel : MonoBehaviour
 
         Debug.Log("Fragmentos recolectados: " + posterFragments);
     }
+
+    [Header("Throwables")]
+    public int maxGrenades = 3;
+    public int currentGrenades = 0;
+
+    public int maxShields = 1;
+    public int currentShields = 0;
+
+    public void AddGrenade(int amount = 1)
+    {
+        currentGrenades = Mathf.Clamp(currentGrenades + amount, 0, maxGrenades);
+    }
+
+    public void UseGrenade(int amount = 1)
+    {
+        currentGrenades = Mathf.Clamp(currentGrenades - amount, 0, maxGrenades);
+    }
+
+    public void AddShield(int amount = 1)
+    {
+        currentShields = Mathf.Clamp(currentShields + amount, 0, maxShields);
+    }
+
+    public void UseShield(int amount = 1)
+    {
+        currentShields = Mathf.Clamp(currentShields - amount, 0, maxShields);
+    }
+
 }
