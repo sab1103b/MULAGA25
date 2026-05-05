@@ -6,10 +6,11 @@ public class MiniMapFollow : MonoBehaviour
     public Transform player;
 
     [Header("Altura fija del minimapa")]
-    public float height = 7.6f;
+    public float height = 6.14f;
 
     [Header("Suavizado")]
     public float followSpeed = 8f;
+    public float rotationSpeed = 10f;
 
     [Header("Offset opcional")]
     public Vector3 offset;
@@ -32,6 +33,19 @@ public class MiniMapFollow : MonoBehaviour
             transform.position,
             targetPosition,
             followSpeed * Time.deltaTime
+        );
+
+        // ROTACIÓN (solo eje Y)
+        // =========================
+        float targetYRotation = player.eulerAngles.y;
+
+        Quaternion targetRotation = Quaternion.Euler(0f, targetYRotation, 0f);
+        // 90f en X para que mire hacia abajo (típico minimapa)
+
+        transform.rotation = Quaternion.Lerp(
+            transform.rotation,
+            targetRotation,
+            rotationSpeed * Time.deltaTime
         );
     }
 }

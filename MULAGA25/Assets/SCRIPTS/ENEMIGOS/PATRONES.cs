@@ -17,7 +17,7 @@ public class PATRONES : MonoBehaviour
 
     [Header("Ground Detection")]
     public float groundCheckDistance = 20f;
-    public float groundOffset = 0.1f;
+    public float groundOffset = 0.85f;
     public float heightSmooth = 8f;
     public LayerMask groundLayer;
 
@@ -64,7 +64,7 @@ public class PATRONES : MonoBehaviour
     private float jumpTimer = 0f;
 
     public float jumpDistance = 10f;
-    public float jumpHeight = 6f;
+    public float jumpHeight = 3f;
     public float jumpDuration = 1f;
     public float retreatDistance = 25f;
 

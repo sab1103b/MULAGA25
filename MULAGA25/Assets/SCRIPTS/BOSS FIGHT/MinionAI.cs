@@ -57,12 +57,25 @@ public class MinionAI : MonoBehaviour, IDamageable
 
         if (agent != null)
         {
-            agent.enabled       = true;
-            agent.isStopped     = false;
-            agent.stoppingDistance = stopDistance;
-            agent.speed         = walkSpeed;
-            agent.angularSpeed  = 360f;
-            agent.acceleration  = 12f;
+            agent.enabled = true;
+
+            // ⚠️ Forzar al NavMesh antes de usar el agente
+            NavMeshHit hit;
+            if (NavMesh.SamplePosition(transform.position, out hit, 2f, NavMesh.AllAreas))
+            {
+                agent.Warp(hit.position);
+
+                agent.stoppingDistance = stopDistance;
+                agent.speed = walkSpeed;
+                agent.angularSpeed = 360f;
+                agent.acceleration = 12f;
+
+                agent.isStopped = false; // ← ahora sí es seguro
+            }
+            else
+            {
+                Debug.LogWarning($"{gameObject.name}: no encontró NavMesh al activarse.");
+            }
         }
 
         if (player == null)
