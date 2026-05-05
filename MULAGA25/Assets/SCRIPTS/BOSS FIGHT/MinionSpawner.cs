@@ -13,13 +13,17 @@ public class MinionSpawner : MonoBehaviour
     [Header("References")]
     public BossArena arena;
 
-    public void SpawnWave(int count)
+    // ─────────────────────────────────────────────────────────────────────────
+    /// <summary>
+    /// Spawnea una oleada. El BossController pasa 'aggressive = true' en fases 2 y 3.
+    /// </summary>
+    public void SpawnWave(int count, bool aggressive = false)
     {
         for (int i = 0; i < count; i++)
-            SpawnOneMinion();
+            SpawnOneMinion(aggressive);
     }
 
-    void SpawnOneMinion()
+    void SpawnOneMinion(bool aggressive)
     {
         if (pool == null)
         {
@@ -30,8 +34,7 @@ public class MinionSpawner : MonoBehaviour
         if (player == null)
         {
             GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
-            if (playerObj != null)
-                player = playerObj.transform;
+            if (playerObj != null) player = playerObj.transform;
         }
 
         if (spawnPoints == null || spawnPoints.Length == 0)
@@ -41,35 +44,32 @@ public class MinionSpawner : MonoBehaviour
         }
 
         GameObject enemy = pool.GetEnemy();
-
         if (enemy == null)
         {
             Debug.LogWarning("MinionSpawner: pool vacío.");
             return;
         }
 
-        Transform spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Length)];
+        Transform spawnPoint   = spawnPoints[Random.Range(0, spawnPoints.Length)];
+        Vector3   spawnPosition = spawnPoint.position + spawnPoint.forward * 0.8f;
 
         NavMeshHit hit;
-        Vector3 spawnPosition = spawnPoint.position + spawnPoint.forward * 0.8f;
-
         if (NavMesh.SamplePosition(spawnPosition, out hit, 3f, NavMesh.AllAreas))
             spawnPosition = hit.position;
         else
             Debug.LogWarning("MinionSpawner: no encontró NavMesh cerca del spawn point.");
 
+        // Desactivar antes de reposicionar (evita glitches del NavMeshAgent)
         enemy.SetActive(false);
 
         NavMeshAgent agent = enemy.GetComponent<NavMeshAgent>();
-        if (agent != null)
-            agent.enabled = false;
+        if (agent != null) agent.enabled = false;
 
         enemy.transform.position = spawnPosition;
         enemy.transform.rotation = spawnPoint.rotation;
 
         Collider col = enemy.GetComponent<Collider>();
-        if (col != null)
-            col.enabled = true;
+        if (col != null) col.enabled = true;
 
         enemy.SetActive(true);
 
@@ -81,12 +81,12 @@ public class MinionSpawner : MonoBehaviour
         }
 
         MinionAI ai = enemy.GetComponent<MinionAI>();
-
         if (ai != null)
         {
             ai.arena = arena;
             ai.SetPlayer(player);
-            Debug.Log("Minion spawneado y configurado.");
+            ai.SetAggressiveMode(aggressive);   // ← nuevo: aplica el modo de la fase actual
+            Debug.Log($"Minion spawneado — agresivo: {aggressive}.");
         }
         else
         {
