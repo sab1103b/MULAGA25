@@ -2,9 +2,11 @@ using UnityEngine;
 
 public class BossProjectile : MonoBehaviour
 {
+    [Header("Arc Settings")]
     public float arcHeight = 6f;
     public float travelTime = 1.2f;
 
+    [Header("Explosion")]
     public float explosionRadius = 1.8f;
     public int damage = 40;
     public GameObject explosionVFX;
@@ -16,17 +18,37 @@ public class BossProjectile : MonoBehaviour
     private bool initialized = false;
     private bool exploded = false;
 
+    private GameObject linkedWarning;
+
+    // Método normal
     public void Initialize(Vector3 lockedTarget)
     {
         startPos = transform.position;
 
         targetPos = lockedTarget;
-        targetPos.y = 0.1f;
+        targetPos.y = 0.05f;
 
         timer = 0f;
         initialized = true;
 
-        Destroy(gameObject, 5f);
+        Destroy(gameObject, travelTime + 1f);
+    }
+
+    // Método sincronizado con alerta
+    public void Initialize(Vector3 lockedTarget, float customTravelTime, GameObject warning)
+    {
+        startPos = transform.position;
+
+        targetPos = lockedTarget;
+        targetPos.y = 0.05f;
+
+        travelTime = customTravelTime;
+        linkedWarning = warning;
+
+        timer = 0f;
+        initialized = true;
+
+        Destroy(gameObject, travelTime + 1f);
     }
 
     void Update()
@@ -34,14 +56,30 @@ public class BossProjectile : MonoBehaviour
         if (!initialized || exploded) return;
 
         timer += Time.deltaTime;
-        float t = timer / travelTime;
 
+        float t = Mathf.Clamp01(timer / travelTime);
+
+        // Movimiento horizontal hacia el target
         Vector3 pos = Vector3.Lerp(startPos, targetPos, t);
 
-        float height = arcHeight * Mathf.Sin(Mathf.PI * t);
-        pos.y += height;
+        // Arco vertical
+        pos.y += arcHeight * Mathf.Sin(Mathf.PI * t);
 
         transform.position = pos;
+
+        // Rotar hacia la dirección del movimiento
+        if (t < 0.99f)
+        {
+            float nextT = Mathf.Clamp01(t + 0.02f);
+
+            Vector3 nextPos = Vector3.Lerp(startPos, targetPos, nextT);
+            nextPos.y += arcHeight * Mathf.Sin(Mathf.PI * nextT);
+
+            Vector3 dir = nextPos - pos;
+
+            if (dir.sqrMagnitude > 0.001f)
+                transform.rotation = Quaternion.LookRotation(dir);
+        }
 
         if (t >= 1f)
             Explode();
@@ -63,10 +101,21 @@ public class BossProjectile : MonoBehaviour
             if (hit.CompareTag("Player"))
             {
                 IDamageable dmg = hit.GetComponentInParent<IDamageable>();
-                dmg?.TakeDamage(damage);
+
+                if (dmg != null)
+                    dmg.TakeDamage(damage);
             }
         }
 
+        if (linkedWarning != null)
+            Destroy(linkedWarning);
+
         Destroy(gameObject);
+    }
+
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.magenta;
+        Gizmos.DrawWireSphere(transform.position, explosionRadius);
     }
 }
