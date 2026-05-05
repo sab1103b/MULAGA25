@@ -1049,7 +1049,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 59fd2cdb80a1c2a43ab0d7e1e8167e94, type: 2}
+  - {fileID: 2100000, guid: 1594d5350b0fb5946aee2ba7c49d7ae0, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1090,8 +1090,8 @@ Transform:
   m_GameObject: {fileID: 332232520}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -26.76, y: -0.04, z: 8.3}
-  m_LocalScale: {x: 6.904497, y: 7.909168, z: 7.574252}
+  m_LocalPosition: {x: -26.55, y: -0.04, z: 8.3}
+  m_LocalScale: {x: 6.72139, y: 7.6994166, z: 7.373383}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -2972,6 +2972,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 344898f2fbda0be419c9e86a204b18a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LeftHandGrenadeController
+  playerModel: {fileID: 0}
   currentMode: 0
   leftHandSocket: {fileID: 0}
   grenadeStorageSocket: {fileID: 0}
@@ -3817,6 +3818,10 @@ MonoBehaviour:
   posterFragments: 0
   deathCanvas: {fileID: 0}
   playerCamera: {fileID: 0}
+  maxGrenades: 3
+  currentGrenades: 0
+  maxShields: 1
+  currentShields: 0
 --- !u!114 &1554501040
 MonoBehaviour:
   m_ObjectHideFlags: 0
