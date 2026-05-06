@@ -31,6 +31,7 @@ public class VRMenuPositioner : MonoBehaviour
 
         // Rotación hacia el jugador
         panel.LookAt(xrCamera);
+        panel.Rotate(0, 180f, 0);
         panel.eulerAngles = new Vector3(0, panel.eulerAngles.y, 0);
     }
 }

@@ -52,7 +52,7 @@ public class SettingsMenu : MonoBehaviour
             // 🔥 PAUSAR
             Time.timeScale = 0f;
 
-            bool isLobby = SceneManager.GetActiveScene().name == "Lobby";
+            bool isLobby = SceneManager.GetActiveScene().name == "LobbyScene";
 
             if (lobbyButtons != null)
                 lobbyButtons.SetActive(isLobby);
@@ -88,13 +88,19 @@ public class SettingsMenu : MonoBehaviour
 
     public void SalirJuego()
     {
-        Application.Quit();
-    }
+        Time.timeScale = 1f;
+
+    #if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;    
+    #else
+            Application.Quit();
+    #endif
+        }
 
     public void VolverLobby()
     {
         Time.timeScale = 1f;
-        SceneManager.LoadScene("Lobby");
+        SceneManager.LoadScene("LobbyScene");
     }
 
     public void VolverNivel()

@@ -8,9 +8,8 @@ public class VolumeController : MonoBehaviour
 
     public void SetVolume(float value)
     {
-        // Convertir a decibeles
+        value = Mathf.Clamp(value, 0.0001f, 1f);
         float volume = Mathf.Log10(value) * 20;
-
         mixer.SetFloat(volumeParameter, volume);
     }
 }
