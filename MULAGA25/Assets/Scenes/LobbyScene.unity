@@ -2066,6 +2066,10 @@ PrefabInstance:
       value: SoundManager, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 2456353264111866602, guid: 7790883d633ad1245b83087bf2791a73, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 1318.45
+      objectReference: {fileID: 0}
+    - target: {fileID: 2456353264111866602, guid: 7790883d633ad1245b83087bf2791a73, type: 3}
       propertyPath: m_LocalRotation.w
       value: 1
       objectReference: {fileID: 0}
@@ -2152,6 +2156,10 @@ PrefabInstance:
     - target: {fileID: 6976319543292708375, guid: 7790883d633ad1245b83087bf2791a73, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8748528846806502503, guid: 7790883d633ad1245b83087bf2791a73, type: 3}
+      propertyPath: m_Color.a
+      value: 0.8156863
       objectReference: {fileID: 0}
     - target: {fileID: 9025529604134395750, guid: 7790883d633ad1245b83087bf2791a73, type: 3}
       propertyPath: m_AnchorMax.y
