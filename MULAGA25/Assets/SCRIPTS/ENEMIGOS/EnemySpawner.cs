@@ -7,11 +7,15 @@ public class EnemySpawner : MonoBehaviour
 
     public Transform[] spawnPoints;
 
+    public AudioClip spawnSound;
+
     public void SpawnEnemy()
     {
         GameObject enemy = pool.GetEnemy();
 
         if (enemy == null) return;
+
+
 
         // Elegir spawnpoint aleatorio
         Transform spawn = spawnPoints[Random.Range(0, spawnPoints.Length)];

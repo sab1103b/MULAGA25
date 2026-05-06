@@ -68,13 +68,32 @@ public class PATRONES : MonoBehaviour
     public float jumpDuration = 1f;
     public float retreatDistance = 25f;
 
+    // AUDIOS
+    private AudioSource audioSource;
 
-
+    void Awake()
+    {
+        audioSource = GetComponent<AudioSource>();
+    }
     void Start()
     {
         if (player != null)
         {
             playerHead = player.GetComponentInChildren<Camera>()?.transform;
+        }
+    }
+
+    void OnEnable()
+    {
+        if (audioSource != null && audioSource.clip != null)
+        {
+            audioSource.Stop();
+            audioSource.Play();
+        }
+
+        if (audioSource == null)
+        {
+            Debug.LogWarning("Enemy sin AudioSource", this);
         }
     }
 
