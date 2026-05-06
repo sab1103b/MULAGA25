@@ -38,4 +38,18 @@ public class SoundManager : MonoBehaviour
             AudioListener.volume = savedVolume;
         }
     }
+
+    private static SoundManager instance;
+
+    void Awake()
+    {
+        if (instance != null && instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
 }
