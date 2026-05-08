@@ -18,4 +18,11 @@ public class AudioManager : MonoBehaviour
         float db = Mathf.Log10(value) * 20;
         mixer.SetFloat("SFXVolume", db);
     }
+
+    public void SetVOZVolume(float value)
+    {
+        value = Mathf.Clamp(value, 0.0001f, 1f);
+        float db = Mathf.Log10(value) * 20;
+        mixer.SetFloat("VOZVolume", db);
+    }
 }
