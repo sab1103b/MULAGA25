@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class VRMenuPositioner : MonoBehaviour
 {
@@ -33,5 +34,28 @@ public class VRMenuPositioner : MonoBehaviour
         panel.LookAt(xrCamera);
         panel.Rotate(0, 180f, 0);
         panel.eulerAngles = new Vector3(0, panel.eulerAngles.y, 0);
+    }
+
+    void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        FindCamera();
+    }
+
+    void FindCamera()
+    {
+        Camera cam = Camera.main;
+
+        if (cam != null)
+            xrCamera = cam.transform;
     }
 }
