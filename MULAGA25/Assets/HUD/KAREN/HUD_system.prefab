@@ -1342,6 +1342,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HUDContadores
   textoBombas: {fileID: 5032855338394520981}
   textoEscudos: {fileID: 6673110571705247234}
+  playerModel: {fileID: 0}
 --- !u!1 &7555674404419441223
 GameObject:
   m_ObjectHideFlags: 0
@@ -1541,7 +1542,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4312952264709752364}
   - component: {fileID: 3101129865006866776}
-  - component: {fileID: 2147045998612130779}
   m_Layer: 0
   m_Name: Consejero_Container
   m_TagString: Untagged
@@ -1585,116 +1585,25 @@ MonoBehaviour:
   panelConsejero: {fileID: 556945415392064578}
   textoUI: {fileID: 3751528325105478994}
   spriteConsejero: {fileID: 8971198067238718396}
+  audioInicio: {fileID: 8300000, guid: 7e1e94297f4d8b64cb59c3b4e21cb89f, type: 3}
+  audioChoque: {fileID: 8300000, guid: bd0dc4466a33e514eb24620dc6e7d2fe, type: 3}
+  audioColeccionable: {fileID: 8300000, guid: 444906ddf6ac7034cbe6f99d5a18c8c5, type: 3}
+  audioBoss: {fileID: 8300000, guid: 41c8416514caadd4b8bea5e44c9e6066, type: 3}
+  audioArma: {fileID: 8300000, guid: 6a88dd2d7411b4541b1c383ad9a689ee, type: 3}
+  audioNivel: {fileID: 8300000, guid: 2f015a9df8c8b6140ba1ff72faa105cd, type: 3}
   textoInicio: "Los profesores han sido absorbidos por los 25 a\xF1os del programa
     y tu misi\xF3n es liberarlos para restaurar el orden en la carrera de multimedia.
     Recuerda estar atento a halos de luz que te pueden ayudar a vencer a los enemigos
     que aparezcan por el mapa."
   Textochoque: "Trata de no chocar con ellos, aunque si te hacen mucho da\xF1o, siempre
     puedes ir al Coase"
-  textoColeccionable: "Bien hecho, sigue buscandolos\t"
-  textoBoss: "Este enemigo no se ve como los dem\xE1s, ten m\xE1s cuidado al atacar."
-  textoarma: "\xA1Has recogido el arma! Ahora puedes enfrentarte a los enemigos con
-    m\xE1s poder."
-  textonivel: "Un lugar curioso...\xBFeso de all\xED es un arma?"
+  textoColeccionable: Debe ser el primero de muchos, luego vuelve al lobby para verlos
+    bien
+  textoBoss: "Este enemigo no se ve como los dem\xE1s, ten mas cuidado al atacar"
+  textoarma: "Si que lo es, ahora podr\xE1s enfrentarte a los enemigos"
+  textonivel: "Un lugar curioso... \xBFEso de all\xED es un arma?"
   velocidadTexto: 0.03
   duracionMensaje: 5
---- !u!82 &2147045998612130779
-AudioSource:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8971198067238718396}
-  m_Enabled: 1
-  serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: cf6da4174ee0d404786d33dd1c77475c, type: 3}
-  m_PlayOnAwake: 0
-  m_Volume: 1
-  m_Pitch: 1
-  Loop: 0
-  Mute: 0
-  Spatialize: 0
-  SpatializePostEffects: 0
-  Priority: 128
-  DopplerLevel: 1
-  MinDistance: 1
-  MaxDistance: 500
-  Pan2D: 0
-  rolloffMode: 0
-  BypassEffects: 0
-  BypassListenerEffects: 0
-  BypassReverbZones: 0
-  rolloffCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  panLevelCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  spreadCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  reverbZoneMixCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
 --- !u!1 &9195410367544882241
 GameObject:
   m_ObjectHideFlags: 0
