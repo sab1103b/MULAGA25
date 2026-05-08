@@ -115,7 +115,7 @@ public class BossController : MonoBehaviour, IDamageable
     // ═══════════════════════════════════════════════════════════════════════════
     //  FASE 2
     // ═══════════════════════════════════════════════════════════════════════════
-    [Header("Phase 2  (HP 33–66%)")]
+    [Header("Phase 2  (HP 33-66%)")]
     public float p2AttackCooldown = 4.5f;
     public float p2SpawnCooldown = 9f;
     public int p2MinionsPerWave = 4;
@@ -201,9 +201,28 @@ public class BossController : MonoBehaviour, IDamageable
     private Coroutine flashRoutine;
     private bool lastInvulnerableState = false;
 
-    private static readonly int BaseColorID = Shader.PropertyToID("_BaseColor");
-    private static readonly int ColorID = Shader.PropertyToID("_Color");
+    private static readonly int BaseColorID     = Shader.PropertyToID("_BaseColor");
+    private static readonly int ColorID         = Shader.PropertyToID("_Color");
     private static readonly int EmissionColorID = Shader.PropertyToID("_EmissionColor");
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    //  ANIMATOR
+    //
+    //  Parámetros que debes tener en el Animator Controller:
+    //    • Speed   (Float)   → idle_baked ↔ caminado
+    //    • Attack  (Trigger) → Armature|ataque
+    //    • Invocar (Trigger) → Armature|invocar
+    //    • Die     (Trigger) → animación de muerte
+    // ═══════════════════════════════════════════════════════════════════════════
+    [Header("Animator")]
+    [Tooltip("Arrastra aquí el Animator del modelo hijo. Si lo dejas vacío se busca automáticamente.")]
+    public Animator bossAnimator;
+
+    // Hashes pre-calculados — más eficiente que strings en cada frame
+    private static readonly int AnimSpeed   = Animator.StringToHash("Speed");
+    private static readonly int AnimAttack  = Animator.StringToHash("Attack");
+    private static readonly int AnimInvocar = Animator.StringToHash("Invocar");
+    private static readonly int AnimDie     = Animator.StringToHash("Die");
 
     // ═══════════════════════════════════════════════════════════════════════════
     //  REFERENCIAS
@@ -226,17 +245,20 @@ public class BossController : MonoBehaviour, IDamageable
 
         if (rb != null)
         {
-            // CLAVE:
-            // Kinematic evita que las balas empujen al boss.
-            // El boss se mueve por código, no por fuerza física externa.
             rb.isKinematic = true;
-            rb.useGravity = false;
-            rb.interpolation = RigidbodyInterpolation.Interpolate;
-            rb.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
-
-            rb.constraints = RigidbodyConstraints.FreezeRotation |
-                             RigidbodyConstraints.FreezePositionY;
+            rb.useGravity  = false;
+            rb.interpolation           = RigidbodyInterpolation.Interpolate;
+            rb.collisionDetectionMode  = CollisionDetectionMode.ContinuousSpeculative;
+            rb.constraints             = RigidbodyConstraints.FreezeRotation |
+                                         RigidbodyConstraints.FreezePositionY;
         }
+
+        // Busca el Animator automáticamente si no se asignó en el Inspector
+        if (bossAnimator == null)
+            bossAnimator = GetComponentInChildren<Animator>();
+
+        if (bossAnimator == null)
+            Debug.LogWarning("[BOSS] No se encontró Animator en los hijos. Las animaciones no funcionarán.");
 
         CacheBossRenderers();
         FindPlayer();
@@ -244,14 +266,13 @@ public class BossController : MonoBehaviour, IDamageable
         ApplyPhaseSettings(BossPhase.Phase1);
         ApplyShieldVisualState(true);
 
-        sideDashTimer = sideDashInterval;
+        sideDashTimer      = sideDashInterval;
         targetLookRotation = transform.rotation;
     }
 
     void FindPlayer()
     {
         GameObject p = GameObject.FindGameObjectWithTag("Player");
-
         if (p != null)
             player = p.transform;
         else
@@ -260,35 +281,36 @@ public class BossController : MonoBehaviour, IDamageable
 
     public void ActivateBoss()
     {
-        if (player == null)
-            FindPlayer();
+        if (player == null) FindPlayer();
 
-        // Evita basura de sesiones anteriores.
         MinionAI.ActiveMinions = 0;
 
-        isActive = true;
-        isTransitioning = false;
-        isAttacking = false;
+        isActive                 = true;
+        isTransitioning          = false;
+        isAttacking              = false;
         isSteppingBackFromDamage = false;
 
-        currentPhase = BossPhase.Phase1;
+        currentPhase  = BossPhase.Phase1;
         currentHealth = maxHealth;
 
         attackTimer = 3f;
-        spawnTimer = p1SpawnCooldown;
-        fightTimer = 0f;
+        spawnTimer  = p1SpawnCooldown;
+        fightTimer  = 0f;
 
-        sideDashTimer = sideDashInterval;
+        sideDashTimer       = sideDashInterval;
         sideDashActiveTimer = 0f;
-        strafeDirection = 1;
+        strafeDirection     = 1;
 
         rotationUpdateTimer = 0f;
-        targetLookRotation = transform.rotation;
+        targetLookRotation  = transform.rotation;
 
-        lastDamageTime = -999f;
+        lastDamageTime   = -999f;
         lastStepBackTime = -999f;
 
         ApplyPhaseSettings(BossPhase.Phase1);
+
+        // Animator: asegura que empiece en idle
+        bossAnimator?.SetFloat(AnimSpeed, 0f);
 
         if (spawnMinionsOnStart)
             SpawnMinionWaveWithShield();
@@ -318,20 +340,18 @@ public class BossController : MonoBehaviour, IDamageable
             HandleMinionSpawn();
         }
 
-        // Si está retrocediendo por daño, no mezcles patrón normal.
-        // Esto evita movimientos bruscos y mareo en VR.
         if (isSteppingBackFromDamage)
         {
             Vector3 toPlayer = player.position - transform.position;
             toPlayer.y = 0f;
-
             if (toPlayer.sqrMagnitude > 0.001f)
                 RotateTowardsPlayerVR(toPlayer.normalized);
 
+            // Durante step-back no hay desplazamiento → idle
+            bossAnimator?.SetFloat(AnimSpeed, 0f);
             return;
         }
 
-        // Se mueve incluso invulnerable, pero lento y VR friendly.
         HandleFelineLocomotion(GetAggressionMultiplier());
     }
 
@@ -346,52 +366,44 @@ public class BossController : MonoBehaviour, IDamageable
         float dist = toPlayer.magnitude;
         if (dist <= 0.01f) return;
 
-        Vector3 dirToPlayer = toPlayer.normalized;
+        Vector3 dirToPlayer    = toPlayer.normalized;
         Vector3 awayFromPlayer = -dirToPlayer;
-        Vector3 right = Vector3.Cross(Vector3.up, dirToPlayer).normalized;
+        Vector3 right          = Vector3.Cross(Vector3.up, dirToPlayer).normalized;
 
         Vector3 desiredMove = Vector3.zero;
 
-        // Movimiento lateral suave tipo acecho.
         sideDashTimer -= Time.deltaTime;
 
         if (sideDashTimer <= 0f)
         {
-            strafeDirection *= -1;
-
-            sideDashDirection = right * strafeDirection;
+            strafeDirection    *= -1;
+            sideDashDirection   = right * strafeDirection;
             sideDashActiveTimer = sideDashDuration;
-
-            sideDashTimer = sideDashInterval / Mathf.Max(1f, aggrMult);
+            sideDashTimer       = sideDashInterval / Mathf.Max(1f, aggrMult);
         }
 
         if (sideDashActiveTimer > 0f)
         {
-            desiredMove += sideDashDirection * sideDashSpeed;
+            desiredMove         += sideDashDirection * sideDashSpeed;
             sideDashActiveTimer -= Time.deltaTime;
         }
 
-        // Muy cerca: retrocede despacio.
         if (dist < minDistance)
         {
             desiredMove += awayFromPlayer * retreatSpeed;
             desiredMove += right * strafeDirection * (strafeSpeed * 0.45f);
         }
-        // Muy lejos: se acerca despacio.
         else if (dist > maxDistance)
         {
             desiredMove += dirToPlayer * approachSpeed;
         }
-        // Distancia ideal: orbita lento.
         else
         {
             float distanceError = dist - orbitDistance;
-
             desiredMove += right * strafeDirection * strafeSpeed;
             desiredMove += dirToPlayer * distanceError * 0.35f;
         }
 
-        // Para VR no dejamos que la agresividad lo vuelva demasiado rápido.
         float vrSafeAggression = Mathf.Clamp(aggrMult, 1f, 1.25f);
         desiredMove *= vrSafeAggression;
 
@@ -399,11 +411,12 @@ public class BossController : MonoBehaviour, IDamageable
         nextPos.y = transform.position.y;
 
         if (arena == null || arena.IsInsideArena(nextPos))
-        {
             transform.position = nextPos;
-        }
 
         RotateTowardsPlayerVR(dirToPlayer);
+
+        // Animator: Speed > 0.1 → caminado | Speed < 0.1 → idle_baked
+        bossAnimator?.SetFloat(AnimSpeed, desiredMove.magnitude);
     }
 
     void RotateTowardsPlayerVR(Vector3 dirToPlayer)
@@ -411,22 +424,16 @@ public class BossController : MonoBehaviour, IDamageable
         if (dirToPlayer.sqrMagnitude <= 0.001f) return;
 
         rotationUpdateTimer -= Time.deltaTime;
+        float angleToPlayer  = Vector3.Angle(transform.forward, dirToPlayer);
 
-        float angleToPlayer = Vector3.Angle(transform.forward, dirToPlayer);
-
-        // Solo actualiza la rotación objetivo cada cierto tiempo
-        // y solo si el ángulo realmente cambió.
         if (rotationUpdateTimer <= 0f && angleToPlayer > rotationDeadAngle)
         {
-            targetLookRotation = Quaternion.LookRotation(dirToPlayer);
+            targetLookRotation  = Quaternion.LookRotation(dirToPlayer);
             rotationUpdateTimer = rotationUpdateInterval;
         }
 
         transform.rotation = Quaternion.Slerp(
-            transform.rotation,
-            targetLookRotation,
-            Time.deltaTime * rotateSpeed
-        );
+            transform.rotation, targetLookRotation, Time.deltaTime * rotateSpeed);
     }
 
     // ═══════════════════════════════════════════════════════════════════════════
@@ -434,17 +441,12 @@ public class BossController : MonoBehaviour, IDamageable
     // ═══════════════════════════════════════════════════════════════════════════
     void StepBackFromDamage()
     {
-        if (Time.time - lastStepBackTime < damageStepBackCooldown)
-            return;
-
-        if (player == null)
-            return;
+        if (Time.time - lastStepBackTime < damageStepBackCooldown) return;
+        if (player == null) return;
 
         lastStepBackTime = Time.time;
 
-        if (stepBackRoutine != null)
-            StopCoroutine(stepBackRoutine);
-
+        if (stepBackRoutine != null) StopCoroutine(stepBackRoutine);
         stepBackRoutine = StartCoroutine(StepBackFromDamageRoutine());
     }
 
@@ -461,36 +463,29 @@ public class BossController : MonoBehaviour, IDamageable
         fromPlayer.Normalize();
 
         Vector3 startPos = transform.position;
-        Vector3 endPos = startPos + fromPlayer * damageStepBackDistance;
+        Vector3 endPos   = startPos + fromPlayer * damageStepBackDistance;
         endPos.y = startPos.y;
 
         if (arena != null && !arena.IsInsideArena(endPos))
-        {
             endPos = startPos;
-        }
 
         float timer = 0f;
 
         while (timer < damageStepBackDuration)
         {
             timer += Time.deltaTime;
-
-            float t = timer / damageStepBackDuration;
-            t = Mathf.SmoothStep(0f, 1f, t);
-
+            float t = Mathf.SmoothStep(0f, 1f, timer / damageStepBackDuration);
             transform.position = Vector3.Lerp(startPos, endPos, t);
 
             Vector3 toPlayer = player.position - transform.position;
             toPlayer.y = 0f;
-
             if (toPlayer.sqrMagnitude > 0.001f)
                 RotateTowardsPlayerVR(toPlayer.normalized);
 
             yield return null;
         }
 
-        transform.position = endPos;
-
+        transform.position       = endPos;
         isSteppingBackFromDamage = false;
     }
 
@@ -509,11 +504,9 @@ public class BossController : MonoBehaviour, IDamageable
             case BossPhase.Phase1:
                 StartCoroutine(SingleProjectileAttack());
                 break;
-
             case BossPhase.Phase2:
                 StartCoroutine(MultiZoneAttack(p2ZoneCount, p2ZoneSpread));
                 break;
-
             case BossPhase.Phase3:
                 if (Random.value > 0.4f)
                     StartCoroutine(TripleAttack());
@@ -536,19 +529,17 @@ public class BossController : MonoBehaviour, IDamageable
             yield break;
         }
 
+        // Animator: Armature|ataque
+        bossAnimator?.SetTrigger(AnimAttack);
+
         Vector3 target = player.position;
         target.y = 0.05f;
 
         GameObject warning = SpawnWarning(target, GetProjectileRadius());
-
-        DangerZoneIndicator dz = warning != null ? warning.GetComponent<DangerZoneIndicator>() : null;
-        if (dz != null)
-            dz.ShowWarning(warningDuration);
-
+        warning?.GetComponent<DangerZoneIndicator>()?.ShowWarning(warningDuration);
         FireProjectileFromTo(attackSpawnPoint.position, target, warningDuration, warning);
 
         yield return new WaitForSeconds(warningDuration);
-
         isAttacking = false;
     }
 
@@ -563,9 +554,11 @@ public class BossController : MonoBehaviour, IDamageable
             yield break;
         }
 
+        // Animator: Armature|ataque
+        bossAnimator?.SetTrigger(AnimAttack);
+
         Vector3 center = player.position;
         center.y = 0.05f;
-
         float radius = GetProjectileRadius();
 
         for (int i = 0; i < zoneCount; i++)
@@ -574,29 +567,20 @@ public class BossController : MonoBehaviour, IDamageable
 
             if (i > 0)
             {
-                float angle = (360f / zoneCount) * i;
-
+                float angle    = (360f / zoneCount) * i;
                 Vector3 offset = new Vector3(
-                    Mathf.Cos(angle * Mathf.Deg2Rad),
-                    0f,
-                    Mathf.Sin(angle * Mathf.Deg2Rad)
-                ) * spread;
-
-                target = center + offset;
+                    Mathf.Cos(angle * Mathf.Deg2Rad), 0f,
+                    Mathf.Sin(angle * Mathf.Deg2Rad)) * spread;
+                target   = center + offset;
                 target.y = 0.05f;
             }
 
             GameObject warning = SpawnWarning(target, radius);
-
-            DangerZoneIndicator dz = warning != null ? warning.GetComponent<DangerZoneIndicator>() : null;
-            if (dz != null)
-                dz.ShowWarning(warningDuration);
-
+            warning?.GetComponent<DangerZoneIndicator>()?.ShowWarning(warningDuration);
             FireProjectileFromTo(attackSpawnPoint.position, target, warningDuration, warning);
         }
 
         yield return new WaitForSeconds(warningDuration);
-
         isAttacking = false;
     }
 
@@ -611,45 +595,33 @@ public class BossController : MonoBehaviour, IDamageable
             yield break;
         }
 
+        // Animator: Armature|ataque
+        bossAnimator?.SetTrigger(AnimAttack);
+
         Vector3 toPlayer = player.position - transform.position;
         toPlayer.y = 0f;
-
-        if (toPlayer.sqrMagnitude < 0.001f)
-            toPlayer = transform.forward;
-
+        if (toPlayer.sqrMagnitude < 0.001f) toPlayer = transform.forward;
         toPlayer.Normalize();
 
-        Vector3 right = Vector3.Cross(Vector3.up, toPlayer).normalized;
-
+        Vector3 right        = Vector3.Cross(Vector3.up, toPlayer).normalized;
         Vector3 lockedTarget = player.position;
-        lockedTarget.y = 0.05f;
+        lockedTarget.y       = 0.05f;
 
         float radius = GetProjectileRadius() * 1.2f;
 
         GameObject sharedWarning = SpawnWarning(lockedTarget, radius);
+        sharedWarning?.GetComponent<DangerZoneIndicator>()?.ShowWarning(warningDuration);
 
-        DangerZoneIndicator dz = sharedWarning != null ? sharedWarning.GetComponent<DangerZoneIndicator>() : null;
-        if (dz != null)
-            dz.ShowWarning(warningDuration);
-
-        float[] offsets =
-        {
-            -p3TripleSpawnOffset,
-            0f,
-            p3TripleSpawnOffset
-        };
+        float[] offsets = { -p3TripleSpawnOffset, 0f, p3TripleSpawnOffset };
 
         for (int i = 0; i < offsets.Length; i++)
         {
-            Vector3 spawnPos = attackSpawnPoint.position + right * offsets[i];
-
+            Vector3 spawnPos       = attackSpawnPoint.position + right * offsets[i];
             GameObject warningOwner = i == 0 ? sharedWarning : null;
-
             FireProjectileFromTo(spawnPos, lockedTarget, warningDuration, warningOwner);
         }
 
         yield return new WaitForSeconds(warningDuration);
-
         isAttacking = false;
     }
 
@@ -660,14 +632,8 @@ public class BossController : MonoBehaviour, IDamageable
             Debug.LogError("[BOSS] DangerZonePrefab no asignado.");
             return null;
         }
-
         GameObject warning = Instantiate(dangerZonePrefab, position, Quaternion.identity);
-
-        DangerZoneIndicator dz = warning.GetComponent<DangerZoneIndicator>();
-
-        if (dz != null)
-            dz.SetRadius(radius);
-
+        warning.GetComponent<DangerZoneIndicator>()?.SetRadius(radius);
         return warning;
     }
 
@@ -678,11 +644,8 @@ public class BossController : MonoBehaviour, IDamageable
             Debug.LogError("[BOSS] ProjectilePrefab no asignado.");
             return;
         }
-
         GameObject proj = Instantiate(projectilePrefab, spawnPos, Quaternion.identity);
-
         BossProjectile bp = proj.GetComponent<BossProjectile>();
-
         if (bp != null)
             bp.Initialize(target, travelTime, warning);
         else
@@ -691,15 +654,9 @@ public class BossController : MonoBehaviour, IDamageable
 
     float GetProjectileRadius()
     {
-        if (projectilePrefab == null)
-            return 1.8f;
-
+        if (projectilePrefab == null) return 1.8f;
         BossProjectile bp = projectilePrefab.GetComponent<BossProjectile>();
-
-        if (bp != null)
-            return bp.explosionRadius;
-
-        return 1.8f;
+        return bp != null ? bp.explosionRadius : 1.8f;
     }
 
     // ═══════════════════════════════════════════════════════════════════════════
@@ -708,11 +665,9 @@ public class BossController : MonoBehaviour, IDamageable
     void HandleMinionSpawn()
     {
         spawnTimer -= Time.deltaTime;
-
         if (spawnTimer > 0f) return;
 
         SpawnMinionWaveWithShield();
-
         spawnTimer = spawnCooldown;
     }
 
@@ -722,8 +677,10 @@ public class BossController : MonoBehaviour, IDamageable
         {
             bool aggressive = currentPhase != BossPhase.Phase1;
 
-            minionSpawner.SpawnWave(minionsPerWave, aggressive);
+            // Animator: Armature|invocar — solo cuando realmente invoca minions
+            bossAnimator?.SetTrigger(AnimInvocar);
 
+            minionSpawner.SpawnWave(minionsPerWave, aggressive);
             ForceShieldForSeconds(minimumShieldTimeAfterWave);
 
             Debug.Log($"[BOSS] Oleada de {minionsPerWave} minions. Escudo activo.");
@@ -744,11 +701,7 @@ public class BossController : MonoBehaviour, IDamageable
     bool IsInvulnerable()
     {
         if (!minionShieldEnabled) return false;
-
-        bool hasActiveMinions = MinionAI.ActiveMinions > 0;
-        bool hasForcedShield = Time.time < shieldUntilTime;
-
-        return hasActiveMinions || hasForcedShield;
+        return MinionAI.ActiveMinions > 0 || Time.time < shieldUntilTime;
     }
 
     // ═══════════════════════════════════════════════════════════════════════════
@@ -758,7 +711,6 @@ public class BossController : MonoBehaviour, IDamageable
     {
         if (!isActive) return;
 
-        // Invulnerable: bloquea daño, flash azul fuerte.
         if (IsInvulnerable())
         {
             Debug.Log($"[BOSS] BLOQUEÓ DAÑO — minions vivos: {MinionAI.ActiveMinions} | Escudo temporal: {Time.time < shieldUntilTime}");
@@ -766,7 +718,6 @@ public class BossController : MonoBehaviour, IDamageable
             return;
         }
 
-        // Cooldown de daño para que no se derrita con ráfagas.
         if (Time.time - lastDamageTime < damageReceiveCooldown)
         {
             Debug.Log("[BOSS] Daño ignorado por cooldown.");
@@ -775,8 +726,8 @@ public class BossController : MonoBehaviour, IDamageable
 
         lastDamageTime = Time.time;
 
-        int finalDamage = Mathf.Max(1, Mathf.RoundToInt(damage * incomingDamageMultiplier));
-        float nextHealth = currentHealth - finalDamage;
+        int   finalDamage = Mathf.Max(1, Mathf.RoundToInt(damage * incomingDamageMultiplier));
+        float nextHealth  = currentHealth - finalDamage;
 
         // Gate Fase 1 → Fase 2
         if (phaseGateEnabled &&
@@ -784,15 +735,10 @@ public class BossController : MonoBehaviour, IDamageable
             nextHealth <= maxHealth * phase2HealthGate)
         {
             currentHealth = maxHealth * phase2HealthGate;
-
             Debug.Log($"[BOSS] RECIBIÓ DAÑO REAL: {finalDamage}. Gate Fase 2 activado.");
-
             StartFlash(damageColor, realDamageFlashDuration);
             StepBackFromDamage();
-
-            if (!isTransitioning)
-                StartCoroutine(PhaseTransition(BossPhase.Phase2));
-
+            if (!isTransitioning) StartCoroutine(PhaseTransition(BossPhase.Phase2));
             return;
         }
 
@@ -802,36 +748,26 @@ public class BossController : MonoBehaviour, IDamageable
             nextHealth <= maxHealth * phase3HealthGate)
         {
             currentHealth = maxHealth * phase3HealthGate;
-
             Debug.Log($"[BOSS] RECIBIÓ DAÑO REAL: {finalDamage}. Gate Fase 3 activado.");
-
             StartFlash(damageColor, realDamageFlashDuration);
             StepBackFromDamage();
-
-            if (!isTransitioning)
-                StartCoroutine(PhaseTransition(BossPhase.Phase3));
-
+            if (!isTransitioning) StartCoroutine(PhaseTransition(BossPhase.Phase3));
             return;
         }
 
         currentHealth = Mathf.Clamp(nextHealth, 0f, maxHealth);
-
         Debug.Log($"[BOSS] RECIBIÓ DAÑO REAL: {finalDamage} | HP: {currentHealth}/{maxHealth}");
 
-        // Feedback rojo + pasos hacia atrás.
+        // Flash rojo da el feedback visual del golpe (sin animación Hit porque el modelo no la tiene)
         StartFlash(damageColor, realDamageFlashDuration);
         StepBackFromDamage();
 
         if (currentHealth <= 0f)
         {
             if (currentPhase == BossPhase.Phase3)
-            {
                 Die();
-            }
             else
-            {
                 currentHealth = 1f;
-            }
         }
     }
 
@@ -845,37 +781,23 @@ public class BossController : MonoBehaviour, IDamageable
         float ratio = currentHealth / maxHealth;
 
         if (ratio <= phase3HealthGate && currentPhase != BossPhase.Phase3)
-        {
-            StartCoroutine(PhaseTransition(BossPhase.Phase3));
-            return;
-        }
+        { StartCoroutine(PhaseTransition(BossPhase.Phase3)); return; }
 
         if (ratio <= phase2HealthGate && currentPhase == BossPhase.Phase1)
-        {
-            StartCoroutine(PhaseTransition(BossPhase.Phase2));
-            return;
-        }
+        { StartCoroutine(PhaseTransition(BossPhase.Phase2)); return; }
 
         if (fightTimer >= phase3ForceTime && currentPhase != BossPhase.Phase3)
-        {
-            StartCoroutine(PhaseTransition(BossPhase.Phase3));
-            return;
-        }
+        { StartCoroutine(PhaseTransition(BossPhase.Phase3)); return; }
 
         if (fightTimer >= phase2ForceTime && currentPhase == BossPhase.Phase1)
-        {
-            StartCoroutine(PhaseTransition(BossPhase.Phase2));
-            return;
-        }
+        { StartCoroutine(PhaseTransition(BossPhase.Phase2)); return; }
     }
 
     IEnumerator PhaseTransition(BossPhase newPhase)
     {
         isTransitioning = true;
-
         Debug.Log($"[BOSS] TRANSICIÓN → {newPhase}");
 
-        // Durante transición también es invulnerable.
         ForceShieldForSeconds(2.5f);
 
         for (int i = 0; i < 4; i++)
@@ -892,14 +814,12 @@ public class BossController : MonoBehaviour, IDamageable
         }
 
         currentPhase = newPhase;
-
         ApplyPhaseSettings(newPhase);
 
-        // Cada cambio de fase invoca minions y vuelve a activar escudo.
+        // Invoca minions (también lanza el trigger Invocar del Animator)
         SpawnMinionWaveWithShield();
 
         isTransitioning = false;
-
         Debug.Log($"[BOSS] Fase activa: {newPhase}");
     }
 
@@ -908,58 +828,30 @@ public class BossController : MonoBehaviour, IDamageable
         switch (phase)
         {
             case BossPhase.Phase1:
-                attackCooldown = p1AttackCooldown;
-                spawnCooldown = p1SpawnCooldown;
-                minionsPerWave = p1MinionsPerWave;
-
-                approachSpeed = 1.45f;
-                retreatSpeed = 1.85f;
-                strafeSpeed = 1.15f;
-                rotateSpeed = 2.2f;
+                attackCooldown = p1AttackCooldown; spawnCooldown = p1SpawnCooldown; minionsPerWave = p1MinionsPerWave;
+                approachSpeed = 1.45f; retreatSpeed = 1.85f; strafeSpeed = 1.15f; rotateSpeed = 2.2f;
                 break;
-
             case BossPhase.Phase2:
-                attackCooldown = p2AttackCooldown;
-                spawnCooldown = p2SpawnCooldown;
-                minionsPerWave = p2MinionsPerWave;
-
-                approachSpeed = 1.65f;
-                retreatSpeed = 2.05f;
-                strafeSpeed = 1.25f;
-                rotateSpeed = 2.4f;
+                attackCooldown = p2AttackCooldown; spawnCooldown = p2SpawnCooldown; minionsPerWave = p2MinionsPerWave;
+                approachSpeed = 1.65f; retreatSpeed = 2.05f; strafeSpeed = 1.25f; rotateSpeed = 2.4f;
                 break;
-
             case BossPhase.Phase3:
-                attackCooldown = p3AttackCooldown;
-                spawnCooldown = p3SpawnCooldown;
-                minionsPerWave = p3MinionsPerWave;
-
-                approachSpeed = 1.85f;
-                retreatSpeed = 2.25f;
-                strafeSpeed = 1.35f;
-                rotateSpeed = 2.6f;
+                attackCooldown = p3AttackCooldown; spawnCooldown = p3SpawnCooldown; minionsPerWave = p3MinionsPerWave;
+                approachSpeed = 1.85f; retreatSpeed = 2.25f; strafeSpeed = 1.35f; rotateSpeed = 2.6f;
                 break;
         }
     }
 
     float GetAggressionMultiplier()
     {
-        if (maxHealth <= 0f)
-            return 1f;
-
-        float hpRatio = currentHealth / maxHealth;
+        if (maxHealth <= 0f) return 1f;
+        float hpRatio  = currentHealth / maxHealth;
         float baseAggr = Mathf.Lerp(maxAggressionMult, 1f, hpRatio);
-
         switch (currentPhase)
         {
-            case BossPhase.Phase2:
-                return baseAggr * 1.15f;
-
-            case BossPhase.Phase3:
-                return baseAggr * 1.25f;
-
-            default:
-                return baseAggr;
+            case BossPhase.Phase2: return baseAggr * 1.15f;
+            case BossPhase.Phase3: return baseAggr * 1.25f;
+            default:               return baseAggr;
         }
     }
 
@@ -982,49 +874,31 @@ public class BossController : MonoBehaviour, IDamageable
         for (int i = 0; i < bossRenderers.Length; i++)
         {
             Renderer r = bossRenderers[i];
-
-            if (r == null || r.sharedMaterial == null)
-            {
-                originalColors[i] = normalFallbackColor;
-                continue;
-            }
+            if (r == null || r.sharedMaterial == null) { originalColors[i] = normalFallbackColor; continue; }
 
             Material mat = r.sharedMaterial;
-
-            if (mat.HasProperty(BaseColorID))
-                originalColors[i] = mat.GetColor(BaseColorID);
-            else if (mat.HasProperty(ColorID))
-                originalColors[i] = mat.GetColor(ColorID);
-            else
-                originalColors[i] = normalFallbackColor;
+            if (mat.HasProperty(BaseColorID))      originalColors[i] = mat.GetColor(BaseColorID);
+            else if (mat.HasProperty(ColorID))     originalColors[i] = mat.GetColor(ColorID);
+            else                                   originalColors[i] = normalFallbackColor;
         }
     }
 
     void ApplyShieldVisualState(bool force)
     {
         bool invulnerable = IsInvulnerable();
-
-        if (!force && invulnerable == lastInvulnerableState)
-            return;
+        if (!force && invulnerable == lastInvulnerableState) return;
 
         lastInvulnerableState = invulnerable;
+        if (flashRoutine != null) return;
 
-        if (flashRoutine != null)
-            return;
-
-        if (invulnerable)
-            SetBossVisualColor(invulnerableColor, true);
-        else
-            RestoreBaseVisualColor();
+        if (invulnerable) SetBossVisualColor(invulnerableColor, true);
+        else              RestoreBaseVisualColor();
     }
 
     void SetBossVisualColor(Color color, bool useEmission)
     {
-        if (bossRenderers == null || bossRenderers.Length == 0)
-            CacheBossRenderers();
-
-        if (bossRenderers == null || propertyBlock == null)
-            return;
+        if (bossRenderers == null || bossRenderers.Length == 0) CacheBossRenderers();
+        if (bossRenderers == null || propertyBlock == null) return;
 
         Color emissionColor = color * emissionIntensity;
 
@@ -1034,23 +908,16 @@ public class BossController : MonoBehaviour, IDamageable
             if (r == null) continue;
 
             r.GetPropertyBlock(propertyBlock);
-
             propertyBlock.SetColor(BaseColorID, color);
             propertyBlock.SetColor(ColorID, color);
-
-            if (useEmission)
-                propertyBlock.SetColor(EmissionColorID, emissionColor);
-            else
-                propertyBlock.SetColor(EmissionColorID, Color.black);
-
+            propertyBlock.SetColor(EmissionColorID, useEmission ? emissionColor : Color.black);
             r.SetPropertyBlock(propertyBlock);
         }
     }
 
     void RestoreBaseVisualColor()
     {
-        if (bossRenderers == null || originalColors == null || propertyBlock == null)
-            return;
+        if (bossRenderers == null || originalColors == null || propertyBlock == null) return;
 
         for (int i = 0; i < bossRenderers.Length; i++)
         {
@@ -1060,35 +927,27 @@ public class BossController : MonoBehaviour, IDamageable
             Color baseColor = i < originalColors.Length ? originalColors[i] : normalFallbackColor;
 
             r.GetPropertyBlock(propertyBlock);
-
             propertyBlock.SetColor(BaseColorID, baseColor);
             propertyBlock.SetColor(ColorID, baseColor);
             propertyBlock.SetColor(EmissionColorID, Color.black);
-
             r.SetPropertyBlock(propertyBlock);
         }
     }
 
     void StartFlash(Color color, float duration)
     {
-        if (flashRoutine != null)
-            StopCoroutine(flashRoutine);
-
+        if (flashRoutine != null) StopCoroutine(flashRoutine);
         flashRoutine = StartCoroutine(FlashRoutine(color, duration));
     }
 
     IEnumerator FlashRoutine(Color color, float duration)
     {
         SetBossVisualColor(color, true);
-
         yield return new WaitForSeconds(duration);
-
         flashRoutine = null;
 
-        if (IsInvulnerable())
-            SetBossVisualColor(invulnerableColor, true);
-        else
-            RestoreBaseVisualColor();
+        if (IsInvulnerable()) SetBossVisualColor(invulnerableColor, true);
+        else                  RestoreBaseVisualColor();
     }
 
     // ═══════════════════════════════════════════════════════════════════════════
@@ -1097,8 +956,10 @@ public class BossController : MonoBehaviour, IDamageable
     void Die()
     {
         isActive = false;
-
         Debug.Log("[BOSS] Derrotado.");
+
+        // Animator: animación de muerte
+        bossAnimator?.SetTrigger(AnimDie);
 
         if (arena != null)
             arena.EndBossFight();
