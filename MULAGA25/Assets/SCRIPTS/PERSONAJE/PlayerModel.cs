@@ -33,7 +33,7 @@ public class PlayerModel : MonoBehaviour
             Morir();
         }
 
-        ConsejeroManager.Instance.EventoChoque();
+        ConsejeroManager.Instance.Evento09();
 
         Debug.Log("Vidas restantes: " + currentLives);
 

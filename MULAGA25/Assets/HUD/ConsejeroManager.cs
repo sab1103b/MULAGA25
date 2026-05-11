@@ -15,42 +15,89 @@ public class ConsejeroManager : MonoBehaviour
     private AudioSource vozSource;
 
     [Header("Clips de Voz")]
-    public AudioClip audioInicio;
-    public AudioClip audioChoque;
-    public AudioClip audioColeccionable;
-    public AudioClip audioBoss;
-    public AudioClip audioArma;
-    public AudioClip audioNivel;
+    // INTRODUCCIÓN
+    public AudioClip Audio1; //
+    public AudioClip Audio2; //
+    public AudioClip Audio3; //
+    public AudioClip Audio4; //
+    public AudioClip Audio5; //
+    // NIVEL
+    public AudioClip Audio6; //
+    public AudioClip Audio7; //
+    public AudioClip Audio8; //
+    public AudioClip Audio9; //
+    public AudioClip Audio10; //
+    public AudioClip Audio11; //
+    public AudioClip Audio12; //
+    public AudioClip Audio13; //
+    public AudioClip Audio14; //
+    public AudioClip Audio15; //
 
     [Header("Textos")]
     [TextArea(3, 5)]
-    public string textoInicio;
+    public string texto01;
 
     [TextArea(3, 5)]
-    public string Textochoque;
+    public string texto02;
 
     [TextArea(3, 5)]
-    public string textoColeccionable;
+    public string texto03;
 
     [TextArea(3, 5)]
-    public string textoBoss;
+    public string texto04;
 
     [TextArea(3, 5)]
-    public string textoarma;
+    public string texto05;
 
     [TextArea(3, 5)]
-    public string textonivel;
+    public string texto06;
+
+    [TextArea(3, 5)]
+    public string texto07;
+
+    [TextArea(3, 5)]
+    public string texto08;
+
+    [TextArea(3, 5)]
+    public string texto09;
+
+    [TextArea(3, 5)]
+    public string texto10;
+
+    [TextArea(3, 5)]
+    public string texto11;
+
+    [TextArea(3, 5)]
+    public string texto12;
+
+    [TextArea(3, 5)]
+    public string texto13;
+
+    [TextArea(3, 5)]
+    public string texto14;
+
+    [TextArea(3, 5)]
+    public string texto15;
 
     [Header("Configuración")]
     public float velocidadTexto = 0.03f;
     public float duracionMensaje = 5f;
 
-    bool yaMostroInicio = false;
-    bool yaMostroChoque = false;
-    bool yaMostroColeccionable = false;
-    bool yaMostroBoss = false;
-    bool YaRecogeelarma = false;
-    bool Entraalnivel = false;
+    bool yaMostro01 = false;
+    bool yaMostro02 = false;
+    bool yaMostro03 = false;
+    bool yaMostro04 = false;
+    bool yaMostro05 = false;
+    bool yaMostro06 = false;
+    bool yaMostro07 = false;
+    bool yaMostro08 = false;
+    bool yaMostro09 = false;
+    bool yaMostro10 = false;
+    bool yaMostro11 = false;
+    bool yaMostro12 = false;
+    bool yaMostro13 = false;
+    bool yaMostro14 = false;
+    bool yaMostro15 = false;
 
     void Awake()
     {
@@ -133,58 +180,132 @@ public class ConsejeroManager : MonoBehaviour
     }
 
     // EVENTOS
-
-    public void EventoInicio()
+    public void Evento01()
     {
-        if (yaMostroInicio) return;
+        if (yaMostro01) return;
 
-        yaMostroInicio = true;
+        yaMostro01 = true;
 
-        MostrarMensaje(textoInicio, audioInicio);
+        MostrarMensaje(texto01, Audio1);
+    }
+    public void Evento02()
+    {
+        if (yaMostro02) return;
+
+        yaMostro02 = true;
+
+        MostrarMensaje(texto02, Audio2);
+    }
+    public void Evento03()
+    {
+        if (yaMostro03) return;
+
+        yaMostro03 = true;
+
+        MostrarMensaje(texto03, Audio3);
+    }
+    public void Evento04()
+    {
+        if (yaMostro04) return;
+
+        yaMostro04 = true;
+
+        MostrarMensaje(texto04, Audio4);
+    }
+    public void Evento05()
+    {
+        if (yaMostro05) return;
+
+        yaMostro05 = true;
+
+        MostrarMensaje(texto05, Audio5);
+    }
+    public void Evento06()
+    {
+        if (yaMostro06) return;
+
+        yaMostro06 = true;
+
+        MostrarMensaje(texto06, Audio6);
+    }
+    public void Evento07()
+    {
+        if (yaMostro07) return;
+
+        yaMostro07 = true;
+
+        MostrarMensaje(texto07, Audio7);
     }
 
-    public void EventoChoque()
+    public void Evento08()
     {
-        if (yaMostroChoque) return;
+        if (yaMostro08) return;
 
-        yaMostroChoque = true;
+        yaMostro08 = true;
 
-        MostrarMensaje(Textochoque, audioChoque);
+        MostrarMensaje(texto08, Audio8);
     }
 
-    public void EventoColeccionable()
+    public void Evento09()
     {
-        if (yaMostroColeccionable) return;
+        if (yaMostro09) return;
 
-        yaMostroColeccionable = true;
+        yaMostro09 = true;
 
-        MostrarMensaje(textoColeccionable, audioColeccionable);
+        MostrarMensaje(texto09, Audio9);
     }
 
-    public void EventoBoss()
+    public void Evento10()
     {
-        if (yaMostroBoss) return;
+        if (yaMostro10) return;
 
-        yaMostroBoss = true;
+        yaMostro10 = true;
 
-        MostrarMensaje(textoBoss, audioBoss);
+        MostrarMensaje(texto10, Audio10);
     }
 
-    public void EventoRecogeArma()
+    public void Evento11()
     {
-        if (YaRecogeelarma) return;
+        if (yaMostro11) return;
 
-        YaRecogeelarma = true;
+        yaMostro11 = true;
 
-        MostrarMensaje(textoarma, audioArma);
+        MostrarMensaje(texto11, Audio11);
     }
 
-    public void EventoEntraNivel()
+    public void Evento12()
     {
-        if (Entraalnivel) return;
+        if (yaMostro12) return;
 
-        Entraalnivel = true;
+        yaMostro12 = true;
 
-        MostrarMensaje(textonivel, audioNivel);
+        MostrarMensaje(texto12, Audio12);
+    }
+
+    public void Evento13()
+    {
+        if (yaMostro13) return;
+
+        yaMostro13 = true;
+
+        MostrarMensaje(texto13, Audio13);
+    }
+
+    public void Evento14()
+    {
+        if (yaMostro14) return;
+
+        yaMostro14 = true;
+
+        MostrarMensaje(texto14, Audio14);
+    }
+
+    public void Evento15()
+    {
+        if (yaMostro15) return;
+
+        yaMostro15 = true;
+
+        MostrarMensaje(texto15, Audio15);
     }
 }

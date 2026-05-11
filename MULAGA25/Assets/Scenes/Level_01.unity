@@ -2927,6 +2927,170 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3101129865006866776, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: Audio1
+      value: 
+      objectReference: {fileID: 8300000, guid: cf6da4174ee0d404786d33dd1c77475c, type: 3}
+    - target: {fileID: 3101129865006866776, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: Audio2
+      value: 
+      objectReference: {fileID: 8300000, guid: 7e1e94297f4d8b64cb59c3b4e21cb89f, type: 3}
+    - target: {fileID: 3101129865006866776, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: Audio3
+      value: 
+      objectReference: {fileID: 8300000, guid: b3d33371279b520448b00ba6e5aa67a7, type: 3}
+    - target: {fileID: 3101129865006866776, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: Audio4
+      value: 
+      objectReference: {fileID: 8300000, guid: e3d52d788ce131c4eb87c0f43a7c6bb7, type: 3}
+    - target: {fileID: 3101129865006866776, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: Audio5
+      value: 
+      objectReference: {fileID: 8300000, guid: f808dd2bfabdb1d48ad9958a2a13b41e, type: 3}
+    - target: {fileID: 3101129865006866776, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: Audio6
+      value: 
+      objectReference: {fileID: 8300000, guid: 2f015a9df8c8b6140ba1ff72faa105cd, type: 3}
+    - target: {fileID: 3101129865006866776, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: Audio7
+      value: 
+      objectReference: {fileID: 8300000, guid: 6a88dd2d7411b4541b1c383ad9a689ee, type: 3}
+    - target: {fileID: 3101129865006866776, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: Audio8
+      value: 
+      objectReference: {fileID: 8300000, guid: 41c8416514caadd4b8bea5e44c9e6066, type: 3}
+    - target: {fileID: 3101129865006866776, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: Audio9
+      value: 
+      objectReference: {fileID: 8300000, guid: bd0dc4466a33e514eb24620dc6e7d2fe, type: 3}
+    - target: {fileID: 3101129865006866776, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: Audio10
+      value: 
+      objectReference: {fileID: 8300000, guid: 444906ddf6ac7034cbe6f99d5a18c8c5, type: 3}
+    - target: {fileID: 3101129865006866776, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: Audio11
+      value: 
+      objectReference: {fileID: 8300000, guid: d8757b02506974248b3cd424fbd8dc90, type: 3}
+    - target: {fileID: 3101129865006866776, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: Audio12
+      value: 
+      objectReference: {fileID: 8300000, guid: 362b37465295a3a4fae69651607fdb2d, type: 3}
+    - target: {fileID: 3101129865006866776, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: Audio13
+      value: 
+      objectReference: {fileID: 8300000, guid: 095fc8bfe454cbd488ed0f58697697c7, type: 3}
+    - target: {fileID: 3101129865006866776, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: Audio14
+      value: 
+      objectReference: {fileID: 8300000, guid: ea5623178aedfad4eac44e6a63701d78, type: 3}
+    - target: {fileID: 3101129865006866776, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: Audio15
+      value: 
+      objectReference: {fileID: 8300000, guid: b04674d8a8548134aa57c752208025e8, type: 3}
+    - target: {fileID: 3101129865006866776, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: texto01
+      value: "\xBFAlgui\xE9n nuevo?, si, alguien que nos podra ayudar"
+      objectReference: {fileID: 0}
+    - target: {fileID: 3101129865006866776, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: texto02
+      value: "\xBFQue qui\xE9n soy?, la verdad no lo recuerdo, tal vez mis archivos
+        lo digan pero desde que ingresamos ac\xE1 fuimos comprimidos"
+      objectReference: {fileID: 0}
+    - target: {fileID: 3101129865006866776, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: texto03
+      value: 'Este mundo podra ser parecido al real, pero no te confies, el Arconte
+        NULL reina aca
+
+'
+      objectReference: {fileID: 0}
+    - target: {fileID: 3101129865006866776, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: texto04
+      value: Si nos quieres ayudar a salir debes recoger nuestras personalidades
+        comprimidas en cada nivel
+      objectReference: {fileID: 0}
+    - target: {fileID: 3101129865006866776, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: texto05
+      value: "Te ver\xE9 dentro para que no est\xE9s p\xE9rdido"
+      objectReference: {fileID: 0}
+    - target: {fileID: 3101129865006866776, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: texto06
+      value: "Un lugar curioso... \xBFEso de all\xED es un arma?"
+      objectReference: {fileID: 0}
+    - target: {fileID: 3101129865006866776, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: texto07
+      value: "Si que lo es, ahora podr\xE1s enfrentarte a los enemigos"
+      objectReference: {fileID: 0}
+    - target: {fileID: 3101129865006866776, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: texto08
+      value: "Este enemigo no se ve como los dem\xE1s, ten mas cuidado al atacar"
+      objectReference: {fileID: 0}
+    - target: {fileID: 3101129865006866776, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: texto09
+      value: "Trata de no chocar con ellos, aunque si te hacen mucho da\xF1o, siempre
+        puedes ir a Coase"
+      objectReference: {fileID: 0}
+    - target: {fileID: 3101129865006866776, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: texto10
+      value: Debe ser el primero de muchos, luego vuelve al lobby para verlos bien
+      objectReference: {fileID: 0}
+    - target: {fileID: 3101129865006866776, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: texto11
+      value: "Revisando algunos de mis archivos encontr\xE9 el nombre pionero, Ingenier\xEDa
+        Digital, Arte y Dise\xF1o Tridimensional. Aqu\xED empez\xF3 todo"
+      objectReference: {fileID: 0}
+    - target: {fileID: 3101129865006866776, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: texto12
+      value: "Qu\xE9 diferencia, los primeros fueron apenas 20  y ahora somos cientos"
+      objectReference: {fileID: 0}
+    - target: {fileID: 3101129865006866776, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: texto13
+      value: "Despu\xE9s de salir de aqui deber\xEDamos vernos en un espacio de IMAGINATIO"
+      objectReference: {fileID: 0}
+    - target: {fileID: 3101129865006866776, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: texto14
+      value: "Deber\xEDas unirte al GIM ... el primer Grupo de Investigaci\xF3n en
+        Multimedia\n"
+      objectReference: {fileID: 0}
+    - target: {fileID: 3101129865006866776, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: texto15
+      value: "Felicidades, un paso menos para salir de aqu\xED"
+      objectReference: {fileID: 0}
+    - target: {fileID: 3101129865006866776, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: textoUI
+      value: 
+      objectReference: {fileID: 282916067}
+    - target: {fileID: 3101129865006866776, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: textoBoss
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3101129865006866776, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: textoarma
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3101129865006866776, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: textonivel
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3101129865006866776, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: Textochoque
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3101129865006866776, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: textoInicio
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3101129865006866776, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: panelConsejero
+      value: 
+      objectReference: {fileID: 282916068}
+    - target: {fileID: 3101129865006866776, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: spriteConsejero
+      value: 
+      objectReference: {fileID: 282916069}
+    - target: {fileID: 3101129865006866776, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: textoColeccionable
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 3480602963242450996, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -3048,6 +3212,27 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+--- !u!114 &282916067 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3751528325105478994, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+  m_PrefabInstance: {fileID: 282916066}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+--- !u!1 &282916068 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7555674404419441223, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+  m_PrefabInstance: {fileID: 282916066}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &282916069 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8971198067238718396, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+  m_PrefabInstance: {fileID: 282916066}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &289583045
 GameObject:
   m_ObjectHideFlags: 0
@@ -21767,6 +21952,63 @@ Transform:
   m_Children: []
   m_Father: {fileID: 97886997}
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
+--- !u!1001 &1917322467
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 6598815579406187027, guid: 18ddb545287c546e19cc77dc9fbb2189, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.88613
+      objectReference: {fileID: 0}
+    - target: {fileID: 6598815579406187027, guid: 18ddb545287c546e19cc77dc9fbb2189, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.68833
+      objectReference: {fileID: 0}
+    - target: {fileID: 6598815579406187027, guid: 18ddb545287c546e19cc77dc9fbb2189, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.8737
+      objectReference: {fileID: 0}
+    - target: {fileID: 6598815579406187027, guid: 18ddb545287c546e19cc77dc9fbb2189, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6598815579406187027, guid: 18ddb545287c546e19cc77dc9fbb2189, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6598815579406187027, guid: 18ddb545287c546e19cc77dc9fbb2189, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6598815579406187027, guid: 18ddb545287c546e19cc77dc9fbb2189, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6598815579406187027, guid: 18ddb545287c546e19cc77dc9fbb2189, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6598815579406187027, guid: 18ddb545287c546e19cc77dc9fbb2189, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6598815579406187027, guid: 18ddb545287c546e19cc77dc9fbb2189, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6598815579406187037, guid: 18ddb545287c546e19cc77dc9fbb2189, type: 3}
+      propertyPath: m_Name
+      value: XR Device Simulator
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 18ddb545287c546e19cc77dc9fbb2189, type: 3}
 --- !u!1 &1918036577 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7462007347644839919, guid: 43a428bd019f8df4f9f93242551d0a0f, type: 3}
@@ -23852,3 +24094,4 @@ SceneRoots:
   - {fileID: 1749194968}
   - {fileID: 1444368068}
   - {fileID: 1634551160}
+  - {fileID: 1917322467}
