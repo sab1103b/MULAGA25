@@ -16,9 +16,51 @@ public class PlayerModel : MonoBehaviour
     public GameObject deathCanvas;
     public Transform playerCamera;
 
+    [Header("Throwables")]
+    public int maxGrenades = 3;
+    public int currentGrenades = 0;
+
+    public int maxShields = 1;
+    public int currentShields = 0;
+
     void Awake()
     {
         currentLives = maxLives;
+
+        BuscarReferencias();
+    }
+
+    void BuscarReferencias()
+    {
+        // -----------------------------------
+        // MAIN CAMERA
+        // -----------------------------------
+        Camera cam = Camera.main;
+
+        if (cam != null)
+        {
+            playerCamera = cam.transform;
+        }
+
+        // -----------------------------------
+        // HUD_VR
+        // -----------------------------------
+        GameObject hudVR = GameObject.Find("HUD_VR");
+
+        if (hudVR != null)
+        {
+            hud = hudVR.GetComponentInChildren<HUD_HealthSystem>(true);
+        }
+
+        // -----------------------------------
+        // UI DEATH CANVAS
+        // -----------------------------------
+        GameObject deathUI = GameObject.Find("UI Death Canvas");
+
+        if (deathUI != null)
+        {
+            deathCanvas = deathUI;
+        }
     }
 
     public void TakeDamage(int amount)
@@ -33,7 +75,10 @@ public class PlayerModel : MonoBehaviour
             Morir();
         }
 
-        ConsejeroManager.Instance.Evento09();
+        if (ConsejeroManager.Instance != null)
+        {
+            ConsejeroManager.Instance.Evento09();
+        }
 
         Debug.Log("Vidas restantes: " + currentLives);
 
@@ -50,26 +95,27 @@ public class PlayerModel : MonoBehaviour
 
         // BLOQUEAR MOVIMIENTO
         var controller = GetComponent<CharacterController>();
+
         if (controller != null)
             controller.enabled = false;
-        
-        // Si tienes script de movimiento, desactívalo también
-        // GetComponent<TuMovimiento>().enabled = false;
 
         MostrarUI();
     }
 
     void MostrarUI()
     {
+        if (deathCanvas == null || playerCamera == null)
+            return;
+
         GameObject ui = Instantiate(deathCanvas);
 
-        Transform cam = playerCamera;
+        // POSICIÓN FRENTE AL JUGADOR
+        ui.transform.position =
+            playerCamera.position +
+            playerCamera.forward * 1.5f;
 
-        // 📍 Posición frente al jugador
-        ui.transform.position = cam.position + cam.forward * 1.5f;
-
-        // 🧭 Rotación hacia el jugador
-        ui.transform.LookAt(cam);
+        // ROTACIÓN HACIA EL JUGADOR
+        ui.transform.LookAt(playerCamera);
         ui.transform.Rotate(0, 180, 0);
     }
 
@@ -80,31 +126,27 @@ public class PlayerModel : MonoBehaviour
         Debug.Log("Fragmentos recolectados: " + posterFragments);
     }
 
-    [Header("Throwables")]
-    public int maxGrenades = 3;
-    public int currentGrenades = 0;
-
-    public int maxShields = 1;
-    public int currentShields = 0;
-
     public void AddGrenade(int amount = 1)
     {
-        currentGrenades = Mathf.Clamp(currentGrenades + amount, 0, maxGrenades);
+        currentGrenades =
+            Mathf.Clamp(currentGrenades + amount, 0, maxGrenades);
     }
 
     public void UseGrenade(int amount = 1)
     {
-        currentGrenades = Mathf.Clamp(currentGrenades - amount, 0, maxGrenades);
+        currentGrenades =
+            Mathf.Clamp(currentGrenades - amount, 0, maxGrenades);
     }
 
     public void AddShield(int amount = 1)
     {
-        currentShields = Mathf.Clamp(currentShields + amount, 0, maxShields);
+        currentShields =
+            Mathf.Clamp(currentShields + amount, 0, maxShields);
     }
 
     public void UseShield(int amount = 1)
     {
-        currentShields = Mathf.Clamp(currentShields - amount, 0, maxShields);
+        currentShields =
+            Mathf.Clamp(currentShields - amount, 0, maxShields);
     }
-
 }

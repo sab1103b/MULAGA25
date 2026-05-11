@@ -15,6 +15,9 @@ public class AreaDetector : MonoBehaviour
     [Header("Velocidad")]
     public float velocidad = 2f;
 
+    [HideInInspector]
+    public bool objetoDentro = false;
+
     private Vector3 posicionCerrada;
     private Vector3 posicionAbierta;
 
@@ -30,17 +33,20 @@ public class AreaDetector : MonoBehaviour
     {
         if (other.gameObject == objetoObjetivo)
         {
+            objetoDentro = true;
+
             if (movimientoActual != null)
                 StopCoroutine(movimientoActual);
 
             movimientoActual = StartCoroutine(MoverSuavemente(posicionAbierta));
         }
     }
-
     private void OnTriggerExit(Collider other)
     {
         if (other.gameObject == objetoObjetivo)
         {
+            objetoDentro = false;
+
             if (movimientoActual != null)
                 StopCoroutine(movimientoActual);
 

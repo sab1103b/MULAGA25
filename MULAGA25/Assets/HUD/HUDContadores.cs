@@ -18,15 +18,24 @@ public class HUDContadores : MonoBehaviour
 
     void Start()
     {
-        if (playerModel == null)
-            playerModel = FindObjectOfType<PlayerModel>();
-
+        BuscarPlayerModel();
         ActualizarHUD();
     }
 
     void Update()
     {
+        // Si cambia de escena o desaparece
+        if (playerModel == null)
+        {
+            BuscarPlayerModel();
+        }
+
         ActualizarHUD();
+    }
+
+    void BuscarPlayerModel()
+    {
+        playerModel = FindAnyObjectByType<PlayerModel>();
     }
 
     public void ActualizarHUD()

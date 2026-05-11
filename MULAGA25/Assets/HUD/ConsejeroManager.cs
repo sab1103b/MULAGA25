@@ -110,12 +110,7 @@ public class ConsejeroManager : MonoBehaviour
         spriteConsejero.SetActive(false);
 
         // BUSCAR AUTOMÁTICAMENTE EL AUDIOSOURCE
-        Camera mainCam = Camera.main;
-
-        if (mainCam != null)
-        {
-            vozSource = mainCam.GetComponent<AudioSource>();
-        }
+        BuscarAudioSource();
 
         if (vozSource == null)
         {
@@ -124,9 +119,29 @@ public class ConsejeroManager : MonoBehaviour
     }
 
     // MÉTODO GENERAL
-   
+
+    void BuscarAudioSource()
+    {
+        Camera mainCam = Camera.main;
+
+        if (mainCam != null)
+        {
+            vozSource = mainCam.GetComponentInChildren<AudioSource>(true);
+        }
+
+        if (vozSource == null)
+        {
+            Debug.LogWarning("No se encontró AudioSource en Main Camera o sus hijos");
+        }
+    }
+
     public void MostrarMensaje(string mensaje, AudioClip audio)
     {
+        if (vozSource == null)
+        {
+            BuscarAudioSource();
+        }
+
         StopAllCoroutines();
 
         // REPRODUCIR AUDIO
