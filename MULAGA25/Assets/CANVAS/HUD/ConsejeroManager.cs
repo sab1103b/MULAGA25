@@ -126,12 +126,18 @@ public class ConsejeroManager : MonoBehaviour
 
         if (mainCam != null)
         {
-            vozSource = mainCam.GetComponentInChildren<AudioSource>(true);
+            // Buscar hijo llamado exactamente "Audio Source"
+            Transform audioChild = mainCam.transform.Find("Audio Source");
+
+            if (audioChild != null)
+            {
+                vozSource = audioChild.GetComponent<AudioSource>();
+            }
         }
 
         if (vozSource == null)
         {
-            Debug.LogWarning("No se encontró AudioSource en Main Camera o sus hijos");
+            Debug.LogWarning("No se encontró el objeto 'Audio Source' dentro de Main Camera");
         }
     }
 

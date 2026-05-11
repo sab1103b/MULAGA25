@@ -37,6 +37,7 @@ public class TutorialObject : MonoBehaviour
     {
         if (GameProgress.Instance != null)
         {
+
             GameProgress.Instance.CompletarTutorial();
         }
 
