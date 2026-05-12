@@ -2889,7 +2889,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1248613311348505366, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
       propertyPath: m_LocalScale.x
-      value: 1.13
+      value: 1.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1248613311348505366, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1248613311348505366, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -70
       objectReference: {fileID: 0}
     - target: {fileID: 1655218436632609798, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
       propertyPath: m_Camera
