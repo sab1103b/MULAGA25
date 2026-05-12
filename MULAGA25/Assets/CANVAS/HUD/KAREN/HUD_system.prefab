@@ -1661,21 +1661,21 @@ MonoBehaviour:
   panelConsejero: {fileID: 556945415392064578}
   textoUI: {fileID: 3751528325105478994}
   spriteConsejero: {fileID: 8971198067238718396}
-  Audio1: {fileID: 8300000, guid: cf6da4174ee0d404786d33dd1c77475c, type: 3}
-  Audio2: {fileID: 8300000, guid: 7e1e94297f4d8b64cb59c3b4e21cb89f, type: 3}
-  Audio3: {fileID: 8300000, guid: b3d33371279b520448b00ba6e5aa67a7, type: 3}
-  Audio4: {fileID: 8300000, guid: e3d52d788ce131c4eb87c0f43a7c6bb7, type: 3}
-  Audio5: {fileID: 8300000, guid: f808dd2bfabdb1d48ad9958a2a13b41e, type: 3}
-  Audio6: {fileID: 8300000, guid: 2f015a9df8c8b6140ba1ff72faa105cd, type: 3}
-  Audio7: {fileID: 8300000, guid: 6a88dd2d7411b4541b1c383ad9a689ee, type: 3}
-  Audio8: {fileID: 8300000, guid: 41c8416514caadd4b8bea5e44c9e6066, type: 3}
-  Audio9: {fileID: 8300000, guid: bd0dc4466a33e514eb24620dc6e7d2fe, type: 3}
-  Audio10: {fileID: 8300000, guid: 444906ddf6ac7034cbe6f99d5a18c8c5, type: 3}
-  Audio11: {fileID: 8300000, guid: d8757b02506974248b3cd424fbd8dc90, type: 3}
-  Audio12: {fileID: 8300000, guid: 362b37465295a3a4fae69651607fdb2d, type: 3}
-  Audio13: {fileID: 8300000, guid: 095fc8bfe454cbd488ed0f58697697c7, type: 3}
-  Audio14: {fileID: 8300000, guid: ea5623178aedfad4eac44e6a63701d78, type: 3}
-  Audio15: {fileID: 8300000, guid: b04674d8a8548134aa57c752208025e8, type: 3}
+  Audio1: {fileID: 0}
+  Audio2: {fileID: 0}
+  Audio3: {fileID: 0}
+  Audio4: {fileID: 0}
+  Audio5: {fileID: 0}
+  Audio6: {fileID: 0}
+  Audio7: {fileID: 0}
+  Audio8: {fileID: 0}
+  Audio9: {fileID: 0}
+  Audio10: {fileID: 0}
+  Audio11: {fileID: 0}
+  Audio12: {fileID: 0}
+  Audio13: {fileID: 0}
+  Audio14: {fileID: 0}
+  Audio15: {fileID: 0}
   texto01: 
   texto02: 
   texto03: 
