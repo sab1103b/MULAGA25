@@ -164,7 +164,7 @@ RectTransform:
   m_GameObject: {fileID: 556945415392064578}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.103452, y: 1.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8042230652180918290}
@@ -586,6 +586,7 @@ RectTransform:
   - {fileID: 113670666168505206}
   - {fileID: 4312952264709752364}
   - {fileID: 2184767253332681816}
+  - {fileID: 7900998494063429136}
   m_Father: {fileID: 9038779283876480001}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -1076,6 +1077,81 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!1 &5049397850747370804
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7900998494063429136}
+  - component: {fileID: 4595119809065581711}
+  - component: {fileID: 951243453487793617}
+  m_Layer: 0
+  m_Name: Configuraciones
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &7900998494063429136
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5049397850747370804}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.6562032, y: 0.6562032, z: 0.6562032}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4978378640902243324}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 367.2, y: 160.4}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &4595119809065581711
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5049397850747370804}
+  m_CullTransparentMesh: 1
+--- !u!114 &951243453487793617
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5049397850747370804}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: 73d52fd2236563a43aa13b8511c333a3, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
 --- !u!1 &5461234890414924489
 GameObject:
   m_ObjectHideFlags: 0
@@ -1585,23 +1661,36 @@ MonoBehaviour:
   panelConsejero: {fileID: 556945415392064578}
   textoUI: {fileID: 3751528325105478994}
   spriteConsejero: {fileID: 8971198067238718396}
-  audioInicio: {fileID: 8300000, guid: 7e1e94297f4d8b64cb59c3b4e21cb89f, type: 3}
-  audioChoque: {fileID: 8300000, guid: bd0dc4466a33e514eb24620dc6e7d2fe, type: 3}
-  audioColeccionable: {fileID: 8300000, guid: 444906ddf6ac7034cbe6f99d5a18c8c5, type: 3}
-  audioBoss: {fileID: 8300000, guid: 41c8416514caadd4b8bea5e44c9e6066, type: 3}
-  audioArma: {fileID: 8300000, guid: 6a88dd2d7411b4541b1c383ad9a689ee, type: 3}
-  audioNivel: {fileID: 8300000, guid: 2f015a9df8c8b6140ba1ff72faa105cd, type: 3}
-  textoInicio: "Los profesores han sido absorbidos por los 25 a\xF1os del programa
-    y tu misi\xF3n es liberarlos para restaurar el orden en la carrera de multimedia.
-    Recuerda estar atento a halos de luz que te pueden ayudar a vencer a los enemigos
-    que aparezcan por el mapa."
-  Textochoque: "Trata de no chocar con ellos, aunque si te hacen mucho da\xF1o, siempre
-    puedes ir al Coase"
-  textoColeccionable: Debe ser el primero de muchos, luego vuelve al lobby para verlos
-    bien
-  textoBoss: "Este enemigo no se ve como los dem\xE1s, ten mas cuidado al atacar"
-  textoarma: "Si que lo es, ahora podr\xE1s enfrentarte a los enemigos"
-  textonivel: "Un lugar curioso... \xBFEso de all\xED es un arma?"
+  Audio1: {fileID: 0}
+  Audio2: {fileID: 0}
+  Audio3: {fileID: 0}
+  Audio4: {fileID: 0}
+  Audio5: {fileID: 0}
+  Audio6: {fileID: 0}
+  Audio7: {fileID: 0}
+  Audio8: {fileID: 0}
+  Audio9: {fileID: 0}
+  Audio10: {fileID: 0}
+  Audio11: {fileID: 0}
+  Audio12: {fileID: 0}
+  Audio13: {fileID: 0}
+  Audio14: {fileID: 0}
+  Audio15: {fileID: 0}
+  texto01: 
+  texto02: 
+  texto03: 
+  texto04: 
+  texto05: 
+  texto06: 
+  texto07: 
+  texto08: 
+  texto09: 
+  texto10: 
+  texto11: 
+  texto12: 
+  texto13: 
+  texto14: 
+  texto15: 
   velocidadTexto: 0.03
   duracionMensaje: 5
 --- !u!1 &9195410367544882241
