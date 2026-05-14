@@ -5815,6 +5815,18 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6976319543292708375, guid: 7790883d633ad1245b83087bf2791a73, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.00030193487
+      objectReference: {fileID: 0}
+    - target: {fileID: 6976319543292708375, guid: 7790883d633ad1245b83087bf2791a73, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.00030193487
+      objectReference: {fileID: 0}
+    - target: {fileID: 6976319543292708375, guid: 7790883d633ad1245b83087bf2791a73, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.00030193487
+      objectReference: {fileID: 0}
+    - target: {fileID: 6976319543292708375, guid: 7790883d633ad1245b83087bf2791a73, type: 3}
       propertyPath: m_LocalRotation.w
       value: 1
       objectReference: {fileID: 0}
@@ -5880,26 +5892,26 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 2456353264111866602, guid: 7790883d633ad1245b83087bf2791a73, type: 3}
-      insertIndex: 1
+      insertIndex: -1
+      addedObject: {fileID: 818641407}
+    - targetCorrespondingSourceObject: {fileID: 2456353264111866602, guid: 7790883d633ad1245b83087bf2791a73, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 209922592}
     - targetCorrespondingSourceObject: {fileID: 2456353264111866602, guid: 7790883d633ad1245b83087bf2791a73, type: 3}
-      insertIndex: 2
+      insertIndex: -1
       addedObject: {fileID: 1950068759}
     - targetCorrespondingSourceObject: {fileID: 2456353264111866602, guid: 7790883d633ad1245b83087bf2791a73, type: 3}
-      insertIndex: 3
+      insertIndex: -1
       addedObject: {fileID: 984871331}
     - targetCorrespondingSourceObject: {fileID: 2456353264111866602, guid: 7790883d633ad1245b83087bf2791a73, type: 3}
-      insertIndex: 4
+      insertIndex: -1
       addedObject: {fileID: 57837201}
     - targetCorrespondingSourceObject: {fileID: 2456353264111866602, guid: 7790883d633ad1245b83087bf2791a73, type: 3}
-      insertIndex: 5
+      insertIndex: -1
       addedObject: {fileID: 2131074796}
     - targetCorrespondingSourceObject: {fileID: 2456353264111866602, guid: 7790883d633ad1245b83087bf2791a73, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1494724519}
-    - targetCorrespondingSourceObject: {fileID: 2456353264111866602, guid: 7790883d633ad1245b83087bf2791a73, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 818641407}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 4584542408766545413, guid: 7790883d633ad1245b83087bf2791a73, type: 3}
       insertIndex: -1
@@ -8727,7 +8739,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::VRMenuPositioner
   panel: {fileID: 719222632}
   xrCamera: {fileID: 1554501036}
-  distancia: 6
+  distancia: 2
   alturaOffset: -0.2
 --- !u!114 &765226311
 MonoBehaviour:
