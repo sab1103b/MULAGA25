@@ -722,6 +722,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 113670666168505206, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 113670666168505206, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -278.8
+      objectReference: {fileID: 0}
     - target: {fileID: 1248613311348505366, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0.4973774
@@ -789,6 +797,14 @@ PrefabInstance:
     - target: {fileID: 2100312410620322731, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2184767253332681816, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.0000037252903
+      objectReference: {fileID: 0}
+    - target: {fileID: 2184767253332681816, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -244.70117
       objectReference: {fileID: 0}
     - target: {fileID: 3101129865006866776, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
       propertyPath: Audio1
@@ -1054,6 +1070,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4312952264709752364, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4312952264709752364, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 208.7
+      objectReference: {fileID: 0}
     - target: {fileID: 4716127786329167446, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
       propertyPath: playerModel
       value: 
@@ -1061,6 +1085,14 @@ PrefabInstance:
     - target: {fileID: 4728206801551229798, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
       propertyPath: m_Name
       value: HUD_system
+      objectReference: {fileID: 0}
+    - target: {fileID: 7900998494063429136, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.0000037252903
+      objectReference: {fileID: 0}
+    - target: {fileID: 7900998494063429136, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 297.9003
       objectReference: {fileID: 0}
     - target: {fileID: 8042230652180918290, guid: c3f86c238dab851449e419cbce33cd69, type: 3}
       propertyPath: m_AnchoredPosition.x
