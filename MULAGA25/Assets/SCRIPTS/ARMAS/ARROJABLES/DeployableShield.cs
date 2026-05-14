@@ -30,8 +30,12 @@ public class DeployableShield : MonoBehaviour
     [SerializeField] private float floorOffset = 0.03f;
 
     [Header("Orientación")]
-    [Tooltip("Si está activo, el escudo mira hacia la cámara/jugador al desplegarse.")]
-    [SerializeField] private bool faceCameraOnDeploy = true;
+    [Tooltip("Ajuste de rotación extra si el mesh del escudo sale girado (ej: 90 si sale de lado).")]
+    [SerializeField] private float meshRotationOffset = 0f;
+
+    // Se asigna desde ShieldBombItem antes de llamar Deploy()
+    // para saber en qué dirección miraba el jugador al lanzar.
+    [HideInInspector] public Vector3 throwerForward = Vector3.forward;
 
     private int currentHealth;
     private bool isDeployed = false;
@@ -40,8 +44,6 @@ public class DeployableShield : MonoBehaviour
     private void Awake()
     {
         currentHealth = shieldHealth;
-
-        // Empezamos pequeño para animar el despliegue
         transform.localScale = Vector3.zero;
     }
 
@@ -65,10 +67,7 @@ public class DeployableShield : MonoBehaviour
         isDeployed = true;
 
         transform.position = finalPosition;
-
-        // El escudo queda vertical, apoyado en el piso.
-        // No se alinea a paredes.
-        transform.rotation = GetShieldRotation(finalPosition, finalNormal);
+        transform.rotation = GetShieldRotation(finalNormal);
 
         if (deployEffectPrefab != null)
         {
@@ -89,7 +88,6 @@ public class DeployableShield : MonoBehaviour
         floorPosition = originalPosition;
         floorNormal = Vector3.up;
 
-        // Primero revisamos si la superficie original ya parece piso.
         if (IsFloorNormal(surfaceNormal))
         {
             floorPosition = originalPosition + surfaceNormal.normalized * floorOffset;
@@ -97,8 +95,6 @@ public class DeployableShield : MonoBehaviour
             return true;
         }
 
-        // Si no era piso, probablemente tocó pared.
-        // Entonces buscamos piso hacia abajo.
         Vector3 rayStart = originalPosition + Vector3.up * groundCheckStartHeight;
 
         if (Physics.Raycast(
@@ -126,26 +122,14 @@ public class DeployableShield : MonoBehaviour
             return false;
 
         float angle = Vector3.Angle(normal.normalized, Vector3.up);
-
         return angle <= maxGroundAngle;
     }
 
-    private Quaternion GetShieldRotation(Vector3 position, Vector3 floorNormal)
+    private Quaternion GetShieldRotation(Vector3 floorNormal)
     {
-        Vector3 forward;
-
-        if (faceCameraOnDeploy && Camera.main != null)
-        {
-            forward = Camera.main.transform.position - position;
-        }
-        else
-        {
-            forward = transform.forward;
-        }
-
-        // Proyectamos la dirección sobre el plano del piso.
-        // Así el escudo queda de pie sobre el piso y no acostado ni pegado a paredes.
-        forward = Vector3.ProjectOnPlane(forward, floorNormal);
+        // Usamos el forward del jugador en el momento del lanzamiento.
+        // Proyectado sobre el plano del piso para que el escudo quede vertical.
+        Vector3 forward = Vector3.ProjectOnPlane(throwerForward, floorNormal);
 
         if (forward.sqrMagnitude <= 0.001f)
             forward = Vector3.ProjectOnPlane(Vector3.forward, floorNormal);
@@ -155,7 +139,8 @@ public class DeployableShield : MonoBehaviour
 
         forward.Normalize();
 
-        return Quaternion.LookRotation(forward, floorNormal);
+        return Quaternion.LookRotation(forward, floorNormal)
+               * Quaternion.Euler(0f, meshRotationOffset, 0f);
     }
 
     private IEnumerator DeployAnimation()
@@ -165,11 +150,8 @@ public class DeployableShield : MonoBehaviour
         while (elapsed < deployDuration)
         {
             elapsed += Time.deltaTime;
-
             float t = Mathf.SmoothStep(0f, 1f, elapsed / deployDuration);
-
             transform.localScale = Vector3.Lerp(Vector3.zero, deployedScale, t);
-
             yield return null;
         }
 
@@ -179,18 +161,15 @@ public class DeployableShield : MonoBehaviour
     private IEnumerator LifetimeRoutine()
     {
         float waitTime = Mathf.Max(0f, lifetime - 1f);
-
         yield return new WaitForSeconds(waitTime);
 
         float blinkTime = 1f;
         float elapsed = 0f;
-
         Renderer[] renderers = GetComponentsInChildren<Renderer>();
 
         while (elapsed < blinkTime)
         {
             elapsed += Time.deltaTime;
-
             bool visible = Mathf.FloorToInt(elapsed / 0.1f) % 2 == 0;
 
             foreach (Renderer r in renderers)
@@ -208,9 +187,7 @@ public class DeployableShield : MonoBehaviour
     public void TakeDamage(int damage)
     {
         if (!isDeployed) return;
-
         currentHealth -= damage;
-
         if (currentHealth <= 0)
             DestroyShield();
     }
