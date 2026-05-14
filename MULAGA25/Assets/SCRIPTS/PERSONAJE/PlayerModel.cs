@@ -109,14 +109,57 @@ public class PlayerModel : MonoBehaviour
 
         GameObject ui = Instantiate(deathCanvas);
 
+        // -----------------------------------
         // POSICIÓN FRENTE AL JUGADOR
-        ui.transform.position =
-            playerCamera.position +
-            playerCamera.forward * 1.5f;
+        // -----------------------------------
 
-        // ROTACIÓN HACIA EL JUGADOR
-        ui.transform.LookAt(playerCamera);
-        ui.transform.Rotate(0, 180, 0);
+        Vector3 forward = playerCamera.forward;
+        forward.y = 0f;
+        forward.Normalize();
+
+        Vector3 pos =
+            playerCamera.position +
+            forward * 1.5f;
+
+        ui.transform.position = pos;
+
+        // -----------------------------------
+        // ROTACIÓN SOLO EN Y
+        // -----------------------------------
+
+        Vector3 lookPos = playerCamera.position;
+        lookPos.y = ui.transform.position.y;
+
+        ui.transform.LookAt(lookPos);
+        ui.transform.Rotate(0, 180f, 0);
+
+        // -----------------------------------
+        // BLOQUEAR MOVIMIENTO VR
+        // -----------------------------------
+
+        MonoBehaviour[] scripts =
+            GetComponents<MonoBehaviour>();
+
+        foreach (MonoBehaviour script in scripts)
+        {
+            // NO desactivar este script
+            if (script != this)
+            {
+                script.enabled = false;
+            }
+        }
+
+        // -----------------------------------
+        // CHARACTER CONTROLLER
+        // -----------------------------------
+
+        CharacterController controller =
+            GetComponent<CharacterController>();
+
+        if (controller != null)
+        {
+            controller.enabled = false;
+        }
     }
 
     public void AddFragment()
