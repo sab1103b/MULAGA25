@@ -12,12 +12,17 @@ public class SettingsMenu : MonoBehaviour
     [Header("Input VR")]
     public InputActionProperty openMenuButton;
 
+    [Header("HUD")]
+    private HUDSceneController hudController;
+
     private bool isOpen = false;
 
     void Start()
     {
         if (panel != null)
             panel.SetActive(false);
+
+        hudController = FindObjectOfType<HUDSceneController>();
     }
 
     void OnEnable()
@@ -65,6 +70,8 @@ public class SettingsMenu : MonoBehaviour
         {
             // 🔥 PAUSAR
             Time.timeScale = 0f;
+            if (hudController != null)
+                hudController.SetHUDVisible(false);
 
             bool isLobby = SceneManager.GetActiveScene().name == "LobbyScene";
 
@@ -83,6 +90,9 @@ public class SettingsMenu : MonoBehaviour
         {
             // 🔥 REANUDAR
             Time.timeScale = 1f;
+
+            if (hudController != null)
+                hudController.ActualizarHUD();
         }
     }
 
@@ -98,6 +108,9 @@ public class SettingsMenu : MonoBehaviour
             panel.SetActive(false);
 
         Time.timeScale = 1f;
+
+        if (hudController != null)
+            hudController.ActualizarHUD();
     }
 
     public void SalirJuego()

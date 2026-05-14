@@ -11,6 +11,8 @@ public class HUDSceneController : MonoBehaviour
     [Header("Detector del arma en Lobby")]
     public AreaDetector areaDetector;
 
+    private bool hudBloqueado = false;
+
     private static HUDSceneController instance;
 
     void Awake()
@@ -50,6 +52,9 @@ public class HUDSceneController : MonoBehaviour
 
     void Update()
     {
+        if (hudBloqueado)
+            return;
+
         // Actualización dinámica en Lobby
         if (SceneManager.GetActiveScene().name == "LobbyScene")
         {
@@ -60,7 +65,7 @@ public class HUDSceneController : MonoBehaviour
         }
     }
 
-    void ActualizarHUD()
+    public void ActualizarHUD()
     {
         string escenaActual = SceneManager.GetActiveScene().name;
 
@@ -100,5 +105,19 @@ public class HUDSceneController : MonoBehaviour
             consejeroContainer.SetActive(false);
             hudContadores.SetActive(false);
         }
+    }
+
+    public void SetHUDVisible(bool visible)
+    {
+        hudBloqueado = !visible;
+
+        if (vidas != null)
+            vidas.SetActive(visible);
+
+        if (consejeroContainer != null)
+            consejeroContainer.SetActive(visible);
+
+        if (hudContadores != null)
+            hudContadores.SetActive(visible);
     }
 }
