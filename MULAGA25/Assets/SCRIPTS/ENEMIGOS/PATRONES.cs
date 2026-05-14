@@ -69,11 +69,22 @@ public class PATRONES : MonoBehaviour
     public float retreatDistance = 25f;
 
     // AUDIOS
+    [Header("Audio")]
+
+    public AudioClip spawnSFX;
+    public AudioClip deathSFX;
+
     private AudioSource audioSource;
 
     void Awake()
     {
         audioSource = GetComponent<AudioSource>();
+
+        if (audioSource != null)
+        {
+            audioSource.loop = false;
+            audioSource.playOnAwake = false;
+        }
     }
     void Start()
     {
@@ -85,11 +96,8 @@ public class PATRONES : MonoBehaviour
 
     void OnEnable()
     {
-        if (audioSource != null && audioSource.clip != null)
-        {
-            audioSource.Stop();
-            audioSource.Play();
-        }
+        // Spawn SFX
+        PlaySpawnSFX();
 
         if (audioSource == null)
         {
@@ -146,7 +154,7 @@ public class PATRONES : MonoBehaviour
                 targetPosition = ZigZag();
                 break;
 
-            case MovementPattern.Rodeo: 
+            case MovementPattern.Rodeo:
                 targetPosition = Rodeo();
                 break;
         }
@@ -389,4 +397,22 @@ public class PATRONES : MonoBehaviour
         return targetPosition;
     }
 
+    void PlaySpawnSFX()
+    {
+        if (audioSource != null && spawnSFX != null)
+        {
+            audioSource.PlayOneShot(spawnSFX);
+        }
+    }
+
+    public void PlayDeathSFX()
+    {
+        if (deathSFX != null)
+        {
+            AudioSource.PlayClipAtPoint(
+                deathSFX,
+                transform.position
+            );
+        }
+    }
 }

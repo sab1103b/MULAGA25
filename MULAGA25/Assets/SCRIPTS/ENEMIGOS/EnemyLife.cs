@@ -15,6 +15,8 @@ public class EnemyLife : MonoBehaviour
     {
         Debug.Log("Enemigo muerto");
 
+        GetComponent<PATRONES>()?.PlayDeathSFX();
+
         DropItem();
 
         gameObject.SetActive(false);
