@@ -93,7 +93,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: b02b145027c2ac04baf11c91a33735be, type: 3}
       propertyPath: m_Name
-      value: camara distancia 1 1
+      value: camara distancia
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -209,7 +209,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 456efdf403d4f434ea46a9a4faa9bf55, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
-  maxHealth: 100
+  maxHealth: 50
 --- !u!65 &8941538694203620242
 BoxCollider:
   m_ObjectHideFlags: 0
