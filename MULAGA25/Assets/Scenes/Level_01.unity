@@ -2375,6 +2375,8 @@ MonoBehaviour:
   jumpHeight: 4
   jumpDuration: 1.2
   retreatDistance: 25
+  spawnSFX: {fileID: 0}
+  deathSFX: {fileID: 0}
 --- !u!114 &208770332
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3074,6 +3076,8 @@ MonoBehaviour:
   jumpHeight: 3
   jumpDuration: 1
   retreatDistance: 25
+  spawnSFX: {fileID: 8300000, guid: 17abae02f31fd624c88ee02c6bd30860, type: 3}
+  deathSFX: {fileID: 8300000, guid: aa9b446e8ac81be4b836262c9af1223e, type: 3}
 --- !u!65 &296265857
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3132,7 +3136,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 2551512698338671959, guid: d8f397dc2947992459ef77545d391f91, type: 2}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: 17abae02f31fd624c88ee02c6bd30860, type: 3}
+  m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
@@ -6788,7 +6792,7 @@ MonoBehaviour:
   rangedPrefab: {fileID: 5959087442448862624, guid: aba9c6701010c16469198a1f4eae07af, type: 3}
   meleePoolSize: 8
   rangedPoolSize: 5
-  meleeProbability: 0.6
+  meleeProbability: 0.669
 --- !u!1 &782707946
 GameObject:
   m_ObjectHideFlags: 0

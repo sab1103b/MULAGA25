@@ -99,7 +99,10 @@ public class PATRONES_Rango : MonoBehaviour
     // ─────────────────────────────────────────────
 
     [Header("Audio")]
+
+    public AudioClip spawnSFX;
     public AudioClip attackSFX;
+    public AudioClip deathSFX;
 
     private AudioSource audioSource;
 
@@ -132,6 +135,12 @@ public class PATRONES_Rango : MonoBehaviour
     void Awake()
     {
         audioSource = GetComponent<AudioSource>();
+
+        if (audioSource != null)
+        {
+            audioSource.playOnAwake = false;
+            audioSource.loop = false;
+        }
     }
 
     void Start()
@@ -153,11 +162,7 @@ public class PATRONES_Rango : MonoBehaviour
 
         ResolvePlayerHead();
 
-        if (audioSource != null && audioSource.clip != null)
-        {
-            audioSource.Stop();
-            audioSource.Play();
-        }
+        PlaySpawnSFX();
     }
 
     void Update()
@@ -524,17 +529,6 @@ public class PATRONES_Rango : MonoBehaviour
         }
     }
 
-    void PlayAttackSFX()
-    {
-        if (
-            audioSource != null &&
-            attackSFX != null
-        )
-        {
-            audioSource.PlayOneShot(attackSFX);
-        }
-    }
-
     // ─────────────────────────────────────────────
     // SUELO & OBSTÁCULOS
     // ─────────────────────────────────────────────
@@ -629,6 +623,48 @@ public class PATRONES_Rango : MonoBehaviour
         if (mainCam != null)
         {
             playerHead = mainCam.transform;
+        }
+    }
+
+    void PlaySpawnSFX()
+    {
+        if (
+            spawnSFX != null
+        )
+        {
+            AudioSource.PlayClipAtPoint(
+                spawnSFX,
+                transform.position,
+                1f
+            );
+        }
+    }
+
+    void PlayAttackSFX()
+    {
+        if (
+            audioSource != null &&
+            attackSFX != null
+        )
+        {
+            audioSource.PlayOneShot(
+                attackSFX,
+                0.06f // volumen
+            );
+        }
+    }
+
+    public void PlayDeathSFX()
+    {
+        if (
+            deathSFX != null
+        )
+        {
+            AudioSource.PlayClipAtPoint(
+                deathSFX,
+                transform.position,
+                1f
+            );
         }
     }
 }
