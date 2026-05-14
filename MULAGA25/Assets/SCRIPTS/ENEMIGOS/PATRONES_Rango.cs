@@ -1,32 +1,39 @@
-﻿using UnityEngine;
+﻿// ─────────────────────────────────────────────────────────────
+// PATRONES_Rango.cs
+// ─────────────────────────────────────────────────────────────
+
+using UnityEngine;
 using System.Collections;
 
 /// <summary>
 /// Enemigo de distancia.
-/// 
-/// MOVIMIENTO:
-///   - Mantiene siempre preferredDistance con el jugador (se aleja/acerca suavemente).
-///   - Si el jugador invade retreatDistance, espera retreatDelay segundos y luego huye.
-///   - Si una pared bloquea la huida, se detiene hasta que el jugador vuelva a alejarse.
-///   - Al volver a la distancia preferida, retoma el comportamiento normal (órbita + ataque).
 ///
-/// ATAQUE (según distancia):
-///   - Mediana (retreatDistance … mediumRangeThreshold): ráfaga de 5 proyectiles lentos.
-///   - Larga   (mediumRangeThreshold … attackRange):     un proyectil rápido único.
-///   - Ambos hacen 1 hit de daño completo (model.TakeDamage(1)).
+/// ZONAS:
+///   - 0m → 8m     = ráfaga con mucha caída.
+///   - 8m+         = sniper rápido con poca caída.
+///
+/// MOVIMIENTO:
+///   - Menos de 4m → huye.
+///   - Huye hasta recuperar 10m.
+///   - Si hay pared durante huida → quieto.
+///   - Más de 12m → se acerca.
+///   - Entre 10m y 12m → órbita.
 /// </summary>
 public class PATRONES_Rango : MonoBehaviour
 {
     // ─────────────────────────────────────────────
-    //  REFERENCIAS
+    // REFERENCIAS
     // ─────────────────────────────────────────────
+
     [Header("Player Reference")]
     public Transform player;
+
     private Transform playerHead;
 
     // ─────────────────────────────────────────────
-    //  SUELO & PAREDES
+    // SUELO & PAREDES
     // ─────────────────────────────────────────────
+
     [Header("Ground Detection")]
     public float groundCheckDistance = 20f;
     public float groundOffset = 0.1f;
@@ -39,64 +46,88 @@ public class PATRONES_Rango : MonoBehaviour
     public LayerMask obstacleLayer;
 
     // ─────────────────────────────────────────────
-    //  MOVIMIENTO
+    // MOVIMIENTO
     // ─────────────────────────────────────────────
+
     [Header("Movement")]
     public float moveSpeed = 4f;
-    /// <summary>Distancia de combate ideal. El enemigo intenta mantenerse aquí siempre.</summary>
-    public float preferredDistance = 12f;
-    /// <summary>Si el jugador se acerca menos que esto, arranca el contador de huida.</summary>
-    public float retreatDistance = 7f;
-    /// <summary>Segundos que el jugador debe estar dentro de retreatDistance antes de que el enemigo huya.</summary>
-    public float retreatDelay = 1.2f;
-    /// <summary>Velocidad angular de órbita lateral (°/s).</summary>
+
+    [Header("Distancias IA")]
+
+    // Menos de esto → huida
+    public float retreatDistance = 4f;
+
+    // Recupera esta distancia
+    public float safeDistance = 10f;
+
+    // Más de esto → acercarse
+    public float approachDistance = 12f;
+
+    // Velocidad órbita
     public float orbitSpeed = 40f;
-    /// <summary>Suavizado general de posición.</summary>
-    public float smoothFactor = 5f;
+
+    // Delay antes de huir
+    public float retreatDelay = 1f;
 
     // ─────────────────────────────────────────────
-    //  ATAQUE
+    // ATAQUE
     // ─────────────────────────────────────────────
+
     [Header("Attack - General")]
     public float attackAngle = 35f;
     public float attackRange = 25f;
     public float attackCooldown = 3f;
+
     public LayerMask attackLayerMask;
+
     public Transform firePoint;
     public GameObject projectilePrefab;
 
-    [Header("Attack - Mediana distancia (ráfaga lenta)")]
-    public float mediumRangeThreshold = 14f;
+    [Header("Cambio de ataque")]
+    public float mediumRangeThreshold = 8f;
+
+    [Header("Ráfaga")]
     public int burstCount = 3;
     public float burstProjectileSpeed = 15f;
     public float burstInterval = 0.18f;
 
-    [Header("Attack - Larga distancia (disparo rápido)")]
+    [Header("Sniper")]
     public float sniperProjectileSpeed = 30f;
 
     // ─────────────────────────────────────────────
-    //  AUDIO
+    // AUDIO
     // ─────────────────────────────────────────────
+
     [Header("Audio")]
     public AudioClip attackSFX;
+
     private AudioSource audioSource;
 
     // ─────────────────────────────────────────────
-    //  ESTADO INTERNO
+    // ESTADOS
     // ─────────────────────────────────────────────
 
-    private enum RetreatState { Normal, WaitingToFlee, Fleeing, BlockedByWall }
+    private enum RetreatState
+    {
+        Normal,
+        WaitingToFlee,
+        Fleeing,
+        BlockedByWall
+    }
+
     private RetreatState retreatState = RetreatState.Normal;
+
     private float retreatDelayTimer = 0f;
+
     private Vector3 fleeDirection = Vector3.zero;
 
     private float attackTimer = 0f;
-    private bool isFiringBurst = false;
-    private float globalTimer = 0f;
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  UNITY LIFECYCLE
-    // ─────────────────────────────────────────────────────────────────────────
+    private bool isFiringBurst = false;
+
+    // ─────────────────────────────────────────────
+    // UNITY
+    // ─────────────────────────────────────────────
 
     void Awake()
     {
@@ -111,11 +142,14 @@ public class PATRONES_Rango : MonoBehaviour
     void OnEnable()
     {
         retreatState = RetreatState.Normal;
+
         retreatDelayTimer = 0f;
+
         fleeDirection = Vector3.zero;
+
         attackTimer = attackCooldown * 0.5f;
+
         isFiringBurst = false;
-        globalTimer = 0f;
 
         ResolvePlayerHead();
 
@@ -128,50 +162,69 @@ public class PATRONES_Rango : MonoBehaviour
 
     void Update()
     {
-        if (playerHead == null) { ResolvePlayerHead(); return; }
+        if (playerHead == null)
+        {
+            ResolvePlayerHead();
+            return;
+        }
 
-        globalTimer += Time.deltaTime;
         attackTimer += Time.deltaTime;
 
-        float dist = Vector3.Distance(transform.position, playerHead.position);
+        float dist =
+            Vector3.Distance(
+                transform.position,
+                playerHead.position
+            );
 
-        // 1. Actualizar máquina de estados de huida
+        // Máquina de estados
         UpdateRetreatState(dist);
 
-        // 2. Calcular posición objetivo
+        // Movimiento
         Vector3 targetPos = CalculateMovement(dist);
+
         targetPos = AvoidObstacles(targetPos);
+
         targetPos = AdjustToGround(targetPos);
+
         transform.position = targetPos;
 
-        // 3. Rotación: siempre mirando al jugador
+        // Rotación
         RotateTowardPlayer();
 
-        // 4. Ataque (solo en estado Normal)
-        if (retreatState == RetreatState.Normal && !isFiringBurst && CanAttack())
+        // Ataque
+        if (
+            retreatState == RetreatState.Normal &&
+            !isFiringBurst &&
+            CanAttack()
+        )
+        {
             PerformAttack();
+        }
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  MÁQUINA DE ESTADOS DE HUIDA
-    // ─────────────────────────────────────────────────────────────────────────
+    // ─────────────────────────────────────────────
+    // IA DE HUIDA
+    // ─────────────────────────────────────────────
 
     void UpdateRetreatState(float dist)
     {
         switch (retreatState)
         {
             case RetreatState.Normal:
+
                 if (dist < retreatDistance)
                 {
                     retreatState = RetreatState.WaitingToFlee;
+
                     retreatDelayTimer = 0f;
                 }
+
                 break;
 
             case RetreatState.WaitingToFlee:
+
                 retreatDelayTimer += Time.deltaTime;
 
-                // Jugador se alejó antes del delay → cancelar
                 if (dist >= retreatDistance)
                 {
                     retreatState = RetreatState.Normal;
@@ -180,45 +233,57 @@ public class PATRONES_Rango : MonoBehaviour
 
                 if (retreatDelayTimer >= retreatDelay)
                 {
-                    fleeDirection = (transform.position - playerHead.position);
+                    fleeDirection =
+                        (transform.position - playerHead.position);
+
                     fleeDirection.y = 0f;
+
                     fleeDirection.Normalize();
+
                     retreatState = RetreatState.Fleeing;
                 }
+
                 break;
 
             case RetreatState.Fleeing:
-                // ¿Pared delante?
+
                 if (WallAhead(fleeDirection))
                 {
                     retreatState = RetreatState.BlockedByWall;
                     break;
                 }
 
-                // ¿Recuperó la distancia preferida?
-                if (dist >= preferredDistance)
+                if (dist >= safeDistance)
                 {
                     retreatState = RetreatState.Normal;
                     break;
                 }
 
-                // Actualizar dirección de huida en tiempo real para movimiento fluido
-                fleeDirection = (transform.position - playerHead.position);
+                fleeDirection =
+                    (transform.position - playerHead.position);
+
                 fleeDirection.y = 0f;
+
                 fleeDirection.Normalize();
+
                 break;
 
             case RetreatState.BlockedByWall:
-                // Espera quieto hasta que el jugador se aleje
-                if (dist >= preferredDistance)
+
+                if (dist >= safeDistance)
+                {
                     retreatState = RetreatState.Normal;
+                }
+
                 break;
         }
     }
 
     bool WallAhead(Vector3 dir)
     {
-        if (dir == Vector3.zero) return false;
+        if (dir == Vector3.zero)
+            return false;
+
         return Physics.SphereCast(
             transform.position,
             obstacleRadius,
@@ -229,73 +294,132 @@ public class PATRONES_Rango : MonoBehaviour
         );
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  MOVIMIENTO
-    // ─────────────────────────────────────────────────────────────────────────
+    // ─────────────────────────────────────────────
+    // MOVIMIENTO
+    // ─────────────────────────────────────────────
 
     Vector3 CalculateMovement(float dist)
     {
-        // Quieto si está bloqueado por pared
+        // Quieto si hay pared durante huida
         if (retreatState == RetreatState.BlockedByWall)
             return transform.position;
 
-        // Huyendo: moverse en dirección de huida
+        // Huyendo
         if (retreatState == RetreatState.Fleeing)
-            return transform.position + fleeDirection * moveSpeed * Time.deltaTime;
+        {
+            return transform.position +
+                   fleeDirection *
+                   moveSpeed *
+                   Time.deltaTime;
+        }
 
-        // Esperando el delay: sin movimiento
+        // Esperando huida
         if (retreatState == RetreatState.WaitingToFlee)
             return transform.position;
 
-        // ── NORMAL: órbita + corrección de distancia ──────────────────────────
+        // ─────────────────────────────────────
+        // NORMAL
+        // ─────────────────────────────────────
 
-        // Corrección radial: empuja hacia/desde el jugador según el error de distancia
-        Vector3 toPlayer = playerHead.position - transform.position;
+        Vector3 toPlayer =
+            playerHead.position - transform.position;
+
         toPlayer.y = 0f;
-        float distError = toPlayer.magnitude - preferredDistance;  // + = muy lejos, - = muy cerca
-        Vector3 radialMove = toPlayer.normalized * Mathf.Clamp(distError, -moveSpeed, moveSpeed);
 
-        // Órbita lateral
-        float oscillationY = Mathf.Sin(globalTimer * 0.8f) * 0.3f;
-        Vector3 orbitOffset = transform.position - playerHead.position;
-        orbitOffset.y = 0f;
-        orbitOffset = orbitOffset.normalized * preferredDistance;
-        orbitOffset = Quaternion.Euler(0, orbitSpeed * Time.deltaTime, 0) * orbitOffset;
+        Vector3 move = Vector3.zero;
 
-        Vector3 orbitTarget = playerHead.position + orbitOffset;
-        orbitTarget.y += oscillationY * Time.deltaTime * smoothFactor;
+        // Muy lejos → acercarse
+        if (dist > approachDistance)
+        {
+            move = toPlayer.normalized * moveSpeed;
+        }
 
-        // Combinar suavizado de órbita + corrección radial
-        return Vector3.Lerp(transform.position, orbitTarget, smoothFactor * Time.deltaTime)
-               + radialMove * Time.deltaTime;
+        // Zona media → órbita
+        else if (dist >= safeDistance && dist <= approachDistance)
+        {
+            Vector3 orbitOffset =
+                transform.position - playerHead.position;
+
+            orbitOffset.y = 0f;
+
+            orbitOffset =
+                orbitOffset.normalized * safeDistance;
+
+            orbitOffset =
+                Quaternion.Euler(
+                    0,
+                    orbitSpeed * Time.deltaTime,
+                    0
+                ) * orbitOffset;
+
+            Vector3 orbitTarget =
+                playerHead.position + orbitOffset;
+
+            move =
+                (orbitTarget - transform.position).normalized *
+                moveSpeed;
+        }
+
+        return transform.position + move * Time.deltaTime;
     }
 
     void RotateTowardPlayer()
     {
-        Vector3 dir = playerHead.position - transform.position;
-        dir.y = 0f;
-        if (dir.sqrMagnitude < 0.001f) return;
+        Vector3 dir =
+            playerHead.position - transform.position;
 
-        // +180° porque el modelo mira hacia atrás (igual que PATRONES.cs)
-        Quaternion target = Quaternion.LookRotation(dir) * Quaternion.Euler(0, 180f, 0);
-        transform.rotation = Quaternion.Slerp(transform.rotation, target, 6f * Time.deltaTime);
+        dir.y = 0f;
+
+        if (dir.sqrMagnitude < 0.001f)
+            return;
+
+        Quaternion target =
+            Quaternion.LookRotation(dir) *
+            Quaternion.Euler(0, 180f, 0);
+
+        transform.rotation =
+            Quaternion.Slerp(
+                transform.rotation,
+                target,
+                6f * Time.deltaTime
+            );
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  ATAQUE
-    // ─────────────────────────────────────────────────────────────────────────
+    // ─────────────────────────────────────────────
+    // ATAQUE
+    // ─────────────────────────────────────────────
 
     bool CanAttack()
     {
-        if (attackTimer < attackCooldown) return false;
+        if (attackTimer < attackCooldown)
+            return false;
 
-        float dist = Vector3.Distance(transform.position, playerHead.position);
-        if (dist > attackRange) return false;
+        float dist =
+            Vector3.Distance(
+                transform.position,
+                playerHead.position
+            );
 
-        Vector3 dirToPlayer = (playerHead.position - transform.position).normalized;
-        if (Vector3.Angle(-transform.forward, dirToPlayer) > attackAngle) return false;
+        if (dist > attackRange)
+            return false;
 
-        if (Physics.Linecast(transform.position, playerHead.position, obstacleLayer)) return false;
+        Vector3 dirToPlayer =
+            (playerHead.position - transform.position).normalized;
+
+        if (
+            Vector3.Angle(-transform.forward, dirToPlayer)
+            > attackAngle
+        )
+            return false;
+
+        if (
+            Physics.Linecast(
+                transform.position,
+                playerHead.position,
+                obstacleLayer
+            )
+        )
+            return false;
 
         return true;
     }
@@ -303,12 +427,23 @@ public class PATRONES_Rango : MonoBehaviour
     void PerformAttack()
     {
         attackTimer = 0f;
-        float dist = Vector3.Distance(transform.position, playerHead.position);
 
+        float dist =
+            Vector3.Distance(
+                transform.position,
+                playerHead.position
+            );
+
+        // Cerca → ráfaga
         if (dist <= mediumRangeThreshold)
+        {
             StartCoroutine(FireBurst());
+        }
+        // Lejos → sniper
         else
+        {
             FireSniper();
+        }
     }
 
     IEnumerator FireBurst()
@@ -317,10 +452,20 @@ public class PATRONES_Rango : MonoBehaviour
 
         for (int i = 0; i < burstCount; i++)
         {
-            if (!gameObject.activeInHierarchy) break;
-            FireProjectile(burstProjectileSpeed);
+            if (!gameObject.activeInHierarchy)
+                break;
+
+            // Mucha caída
+            FireProjectile(
+                burstProjectileSpeed,
+                3.5f
+            );
+
             PlayAttackSFX();
-            yield return new WaitForSeconds(burstInterval);
+
+            yield return new WaitForSeconds(
+                burstInterval
+            );
         }
 
         isFiringBurst = false;
@@ -328,45 +473,98 @@ public class PATRONES_Rango : MonoBehaviour
 
     void FireSniper()
     {
-        FireProjectile(sniperProjectileSpeed);
+        // Muy poca caída
+        FireProjectile(
+            sniperProjectileSpeed,
+            0.3f
+        );
+
         PlayAttackSFX();
     }
 
-    /// <summary>
-    /// Instancia un proyectil. El daño (1 vida completa) lo gestiona Projectile.cs
-    /// directamente con model.TakeDamage(1) al colisionar con el jugador.
-    /// </summary>
-    void FireProjectile(float speed)
+    void FireProjectile(
+        float speed,
+        float gravityMultiplier
+    )
     {
-        if (projectilePrefab == null || playerHead == null) return;
+        if (
+            projectilePrefab == null ||
+            playerHead == null
+        )
+            return;
 
-        Transform origin = firePoint != null ? firePoint : transform;
-        GameObject proj = Instantiate(projectilePrefab, origin.position, Quaternion.identity);
-        Projectile p = proj.GetComponent<Projectile>();
+        Transform origin =
+            firePoint != null
+            ? firePoint
+            : transform;
+
+        GameObject proj =
+            Instantiate(
+                projectilePrefab,
+                origin.position,
+                Quaternion.identity
+            );
+
+        Projectile p =
+            proj.GetComponent<Projectile>();
 
         if (p != null)
-            p.Initialize((playerHead.position - origin.position).normalized, speed);
+        {
+            Vector3 dir =
+                (
+                    playerHead.position -
+                    origin.position
+                ).normalized;
+
+            p.Initialize(
+                dir,
+                speed,
+                gravityMultiplier
+            );
+        }
     }
 
     void PlayAttackSFX()
     {
-        if (audioSource != null && attackSFX != null)
+        if (
+            audioSource != null &&
+            attackSFX != null
+        )
+        {
             audioSource.PlayOneShot(attackSFX);
+        }
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  SUELO & OBSTÁCULOS
-    // ─────────────────────────────────────────────────────────────────────────
+    // ─────────────────────────────────────────────
+    // SUELO & OBSTÁCULOS
+    // ─────────────────────────────────────────────
 
     Vector3 AdjustToGround(Vector3 targetPosition)
     {
-        Vector3 rayOrigin = targetPosition + Vector3.up * 5f;
+        Vector3 rayOrigin =
+            targetPosition + Vector3.up * 5f;
+
         RaycastHit hit;
 
-        if (Physics.Raycast(rayOrigin, Vector3.down, out hit, groundCheckDistance, groundLayer))
+        if (
+            Physics.Raycast(
+                rayOrigin,
+                Vector3.down,
+                out hit,
+                groundCheckDistance,
+                groundLayer
+            )
+        )
         {
-            float desiredY = hit.point.y + groundOffset;
-            targetPosition.y = Mathf.Lerp(transform.position.y, desiredY, heightSmooth * Time.deltaTime);
+            float desiredY =
+                hit.point.y + groundOffset;
+
+            targetPosition.y =
+                Mathf.Lerp(
+                    transform.position.y,
+                    desiredY,
+                    heightSmooth * Time.deltaTime
+                );
         }
 
         return targetPosition;
@@ -375,20 +573,44 @@ public class PATRONES_Rango : MonoBehaviour
     Vector3 AvoidObstacles(Vector3 targetPosition)
     {
         Vector3 currentPos = transform.position;
-        Vector3 moveDir = targetPosition - currentPos;
+
+        Vector3 moveDir =
+            targetPosition - currentPos;
+
         float moveDist = moveDir.magnitude;
 
-        if (moveDist < 0.001f) return targetPosition;
+        if (moveDist < 0.001f)
+            return targetPosition;
 
         moveDir.Normalize();
 
         RaycastHit hit;
-        if (Physics.SphereCast(currentPos, obstacleRadius, moveDir, out hit, obstacleCheckDistance, obstacleLayer))
+
+        if (
+            Physics.SphereCast(
+                currentPos,
+                obstacleRadius,
+                moveDir,
+                out hit,
+                obstacleCheckDistance,
+                obstacleLayer
+            )
+        )
         {
-            Vector3 slideDir = Vector3.ProjectOnPlane(moveDir, hit.normal).normalized;
+            Vector3 slideDir =
+                Vector3.ProjectOnPlane(
+                    moveDir,
+                    hit.normal
+                ).normalized;
 
             if (slideDir.sqrMagnitude < 0.01f)
-                slideDir = Vector3.Cross(hit.normal, Vector3.up).normalized;
+            {
+                slideDir =
+                    Vector3.Cross(
+                        hit.normal,
+                        Vector3.up
+                    ).normalized;
+            }
 
             return currentPos + slideDir * moveDist;
         }
@@ -396,9 +618,9 @@ public class PATRONES_Rango : MonoBehaviour
         return targetPosition;
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  HELPERS
-    // ─────────────────────────────────────────────────────────────────────────
+    // ─────────────────────────────────────────────
+    // HELPERS
+    // ─────────────────────────────────────────────
 
     void ResolvePlayerHead()
     {
