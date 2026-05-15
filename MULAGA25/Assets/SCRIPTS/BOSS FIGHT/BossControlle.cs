@@ -39,6 +39,31 @@ public class BossController : MonoBehaviour, IDamageable
     public float phase3HealthGate = 0.33f;
 
     // ═══════════════════════════════════════════════════════════════════════════
+    //  DROP AL MORIR
+    // ═══════════════════════════════════════════════════════════════════════════
+    [Header("Drop al morir")]
+    [Tooltip("Prefab del item que el boss va a soltar cuando muera.")]
+    public GameObject itemDropPrefab;
+
+    [Tooltip("Punto exacto donde aparece el item. Si está vacío, aparece en la posición del boss.")]
+    public Transform itemDropPoint;
+
+    [Tooltip("Altura extra para evitar que el item aparezca enterrado en el piso.")]
+    public float itemDropYOffset = 0.35f;
+
+    [Tooltip("Cantidad de items que puede soltar el boss.")]
+    public int itemDropAmount = 1;
+
+    [Tooltip("Separación entre items si suelta más de uno.")]
+    public float itemDropSpread = 0.6f;
+
+    [Tooltip("Fuerza opcional para que el item salga ligeramente hacia arriba.")]
+    public float itemDropUpForce = 2.5f;
+
+    [Tooltip("Evita que el boss dropee dos veces si Die() se llama más de una vez.")]
+    private bool hasDroppedItem = false;
+
+    // ═══════════════════════════════════════════════════════════════════════════
     //  MOVIMIENTO FELINO VR FRIENDLY
     // ═══════════════════════════════════════════════════════════════════════════
     [Header("Feline Locomotion - VR Friendly")]
@@ -207,18 +232,11 @@ public class BossController : MonoBehaviour, IDamageable
 
     // ═══════════════════════════════════════════════════════════════════════════
     //  ANIMATOR
-    //
-    //  Parámetros que debes tener en el Animator Controller:
-    //    • Speed   (Float)   → idle_baked ↔ caminado
-    //    • Attack  (Trigger) → Armature|ataque
-    //    • Invocar (Trigger) → Armature|invocar
-    //    • Die     (Trigger) → animación de muerte
     // ═══════════════════════════════════════════════════════════════════════════
     [Header("Animator")]
     [Tooltip("Arrastra aquí el Animator del modelo hijo. Si lo dejas vacío se busca automáticamente.")]
     public Animator bossAnimator;
 
-    // Hashes pre-calculados — más eficiente que strings en cada frame
     private static readonly int AnimSpeed   = Animator.StringToHash("Speed");
     private static readonly int AnimAttack  = Animator.StringToHash("Attack");
     private static readonly int AnimInvocar = Animator.StringToHash("Invocar");
@@ -253,7 +271,6 @@ public class BossController : MonoBehaviour, IDamageable
                                          RigidbodyConstraints.FreezePositionY;
         }
 
-        // Busca el Animator automáticamente si no se asignó en el Inspector
         if (bossAnimator == null)
             bossAnimator = GetComponentInChildren<Animator>();
 
@@ -289,6 +306,7 @@ public class BossController : MonoBehaviour, IDamageable
         isTransitioning          = false;
         isAttacking              = false;
         isSteppingBackFromDamage = false;
+        hasDroppedItem           = false;
 
         currentPhase  = BossPhase.Phase1;
         currentHealth = maxHealth;
@@ -309,7 +327,6 @@ public class BossController : MonoBehaviour, IDamageable
 
         ApplyPhaseSettings(BossPhase.Phase1);
 
-        // Animator: asegura que empiece en idle
         bossAnimator?.SetFloat(AnimSpeed, 0f);
 
         if (spawnMinionsOnStart)
@@ -347,7 +364,6 @@ public class BossController : MonoBehaviour, IDamageable
             if (toPlayer.sqrMagnitude > 0.001f)
                 RotateTowardsPlayerVR(toPlayer.normalized);
 
-            // Durante step-back no hay desplazamiento → idle
             bossAnimator?.SetFloat(AnimSpeed, 0f);
             return;
         }
@@ -415,7 +431,6 @@ public class BossController : MonoBehaviour, IDamageable
 
         RotateTowardsPlayerVR(dirToPlayer);
 
-        // Animator: Speed > 0.1 → caminado | Speed < 0.1 → idle_baked
         bossAnimator?.SetFloat(AnimSpeed, desiredMove.magnitude);
     }
 
@@ -437,7 +452,7 @@ public class BossController : MonoBehaviour, IDamageable
     }
 
     // ═══════════════════════════════════════════════════════════════════════════
-    //  REACCIÓN AL DAÑO: PASOS HACIA ATRÁS
+    //  REACCIÓN AL DAÑO
     // ═══════════════════════════════════════════════════════════════════════════
     void StepBackFromDamage()
     {
@@ -529,7 +544,6 @@ public class BossController : MonoBehaviour, IDamageable
             yield break;
         }
 
-        // Animator: Armature|ataque
         bossAnimator?.SetTrigger(AnimAttack);
 
         Vector3 target = player.position;
@@ -554,7 +568,6 @@ public class BossController : MonoBehaviour, IDamageable
             yield break;
         }
 
-        // Animator: Armature|ataque
         bossAnimator?.SetTrigger(AnimAttack);
 
         Vector3 center = player.position;
@@ -571,6 +584,7 @@ public class BossController : MonoBehaviour, IDamageable
                 Vector3 offset = new Vector3(
                     Mathf.Cos(angle * Mathf.Deg2Rad), 0f,
                     Mathf.Sin(angle * Mathf.Deg2Rad)) * spread;
+
                 target   = center + offset;
                 target.y = 0.05f;
             }
@@ -595,7 +609,6 @@ public class BossController : MonoBehaviour, IDamageable
             yield break;
         }
 
-        // Animator: Armature|ataque
         bossAnimator?.SetTrigger(AnimAttack);
 
         Vector3 toPlayer = player.position - transform.position;
@@ -616,7 +629,7 @@ public class BossController : MonoBehaviour, IDamageable
 
         for (int i = 0; i < offsets.Length; i++)
         {
-            Vector3 spawnPos       = attackSpawnPoint.position + right * offsets[i];
+            Vector3 spawnPos        = attackSpawnPoint.position + right * offsets[i];
             GameObject warningOwner = i == 0 ? sharedWarning : null;
             FireProjectileFromTo(spawnPos, lockedTarget, warningDuration, warningOwner);
         }
@@ -632,6 +645,7 @@ public class BossController : MonoBehaviour, IDamageable
             Debug.LogError("[BOSS] DangerZonePrefab no asignado.");
             return null;
         }
+
         GameObject warning = Instantiate(dangerZonePrefab, position, Quaternion.identity);
         warning.GetComponent<DangerZoneIndicator>()?.SetRadius(radius);
         return warning;
@@ -644,8 +658,10 @@ public class BossController : MonoBehaviour, IDamageable
             Debug.LogError("[BOSS] ProjectilePrefab no asignado.");
             return;
         }
+
         GameObject proj = Instantiate(projectilePrefab, spawnPos, Quaternion.identity);
         BossProjectile bp = proj.GetComponent<BossProjectile>();
+
         if (bp != null)
             bp.Initialize(target, travelTime, warning);
         else
@@ -677,7 +693,6 @@ public class BossController : MonoBehaviour, IDamageable
         {
             bool aggressive = currentPhase != BossPhase.Phase1;
 
-            // Animator: Armature|invocar — solo cuando realmente invoca minions
             bossAnimator?.SetTrigger(AnimInvocar);
 
             minionSpawner.SpawnWave(minionsPerWave, aggressive);
@@ -729,7 +744,6 @@ public class BossController : MonoBehaviour, IDamageable
         int   finalDamage = Mathf.Max(1, Mathf.RoundToInt(damage * incomingDamageMultiplier));
         float nextHealth  = currentHealth - finalDamage;
 
-        // Gate Fase 1 → Fase 2
         if (phaseGateEnabled &&
             currentPhase == BossPhase.Phase1 &&
             nextHealth <= maxHealth * phase2HealthGate)
@@ -738,11 +752,13 @@ public class BossController : MonoBehaviour, IDamageable
             Debug.Log($"[BOSS] RECIBIÓ DAÑO REAL: {finalDamage}. Gate Fase 2 activado.");
             StartFlash(damageColor, realDamageFlashDuration);
             StepBackFromDamage();
-            if (!isTransitioning) StartCoroutine(PhaseTransition(BossPhase.Phase2));
+
+            if (!isTransitioning)
+                StartCoroutine(PhaseTransition(BossPhase.Phase2));
+
             return;
         }
 
-        // Gate Fase 2 → Fase 3
         if (phaseGateEnabled &&
             currentPhase == BossPhase.Phase2 &&
             nextHealth <= maxHealth * phase3HealthGate)
@@ -751,14 +767,16 @@ public class BossController : MonoBehaviour, IDamageable
             Debug.Log($"[BOSS] RECIBIÓ DAÑO REAL: {finalDamage}. Gate Fase 3 activado.");
             StartFlash(damageColor, realDamageFlashDuration);
             StepBackFromDamage();
-            if (!isTransitioning) StartCoroutine(PhaseTransition(BossPhase.Phase3));
+
+            if (!isTransitioning)
+                StartCoroutine(PhaseTransition(BossPhase.Phase3));
+
             return;
         }
 
         currentHealth = Mathf.Clamp(nextHealth, 0f, maxHealth);
         Debug.Log($"[BOSS] RECIBIÓ DAÑO REAL: {finalDamage} | HP: {currentHealth}/{maxHealth}");
 
-        // Flash rojo da el feedback visual del golpe (sin animación Hit porque el modelo no la tiene)
         StartFlash(damageColor, realDamageFlashDuration);
         StepBackFromDamage();
 
@@ -781,16 +799,28 @@ public class BossController : MonoBehaviour, IDamageable
         float ratio = currentHealth / maxHealth;
 
         if (ratio <= phase3HealthGate && currentPhase != BossPhase.Phase3)
-        { StartCoroutine(PhaseTransition(BossPhase.Phase3)); return; }
+        {
+            StartCoroutine(PhaseTransition(BossPhase.Phase3));
+            return;
+        }
 
         if (ratio <= phase2HealthGate && currentPhase == BossPhase.Phase1)
-        { StartCoroutine(PhaseTransition(BossPhase.Phase2)); return; }
+        {
+            StartCoroutine(PhaseTransition(BossPhase.Phase2));
+            return;
+        }
 
         if (fightTimer >= phase3ForceTime && currentPhase != BossPhase.Phase3)
-        { StartCoroutine(PhaseTransition(BossPhase.Phase3)); return; }
+        {
+            StartCoroutine(PhaseTransition(BossPhase.Phase3));
+            return;
+        }
 
         if (fightTimer >= phase2ForceTime && currentPhase == BossPhase.Phase1)
-        { StartCoroutine(PhaseTransition(BossPhase.Phase2)); return; }
+        {
+            StartCoroutine(PhaseTransition(BossPhase.Phase2));
+            return;
+        }
     }
 
     IEnumerator PhaseTransition(BossPhase newPhase)
@@ -816,7 +846,6 @@ public class BossController : MonoBehaviour, IDamageable
         currentPhase = newPhase;
         ApplyPhaseSettings(newPhase);
 
-        // Invoca minions (también lanza el trigger Invocar del Animator)
         SpawnMinionWaveWithShield();
 
         isTransitioning = false;
@@ -828,16 +857,33 @@ public class BossController : MonoBehaviour, IDamageable
         switch (phase)
         {
             case BossPhase.Phase1:
-                attackCooldown = p1AttackCooldown; spawnCooldown = p1SpawnCooldown; minionsPerWave = p1MinionsPerWave;
-                approachSpeed = 1.45f; retreatSpeed = 1.85f; strafeSpeed = 1.15f; rotateSpeed = 2.2f;
+                attackCooldown = p1AttackCooldown;
+                spawnCooldown = p1SpawnCooldown;
+                minionsPerWave = p1MinionsPerWave;
+                approachSpeed = 1.45f;
+                retreatSpeed = 1.85f;
+                strafeSpeed = 1.15f;
+                rotateSpeed = 2.2f;
                 break;
+
             case BossPhase.Phase2:
-                attackCooldown = p2AttackCooldown; spawnCooldown = p2SpawnCooldown; minionsPerWave = p2MinionsPerWave;
-                approachSpeed = 1.65f; retreatSpeed = 2.05f; strafeSpeed = 1.25f; rotateSpeed = 2.4f;
+                attackCooldown = p2AttackCooldown;
+                spawnCooldown = p2SpawnCooldown;
+                minionsPerWave = p2MinionsPerWave;
+                approachSpeed = 1.65f;
+                retreatSpeed = 2.05f;
+                strafeSpeed = 1.25f;
+                rotateSpeed = 2.4f;
                 break;
+
             case BossPhase.Phase3:
-                attackCooldown = p3AttackCooldown; spawnCooldown = p3SpawnCooldown; minionsPerWave = p3MinionsPerWave;
-                approachSpeed = 1.85f; retreatSpeed = 2.25f; strafeSpeed = 1.35f; rotateSpeed = 2.6f;
+                attackCooldown = p3AttackCooldown;
+                spawnCooldown = p3SpawnCooldown;
+                minionsPerWave = p3MinionsPerWave;
+                approachSpeed = 1.85f;
+                retreatSpeed = 2.25f;
+                strafeSpeed = 1.35f;
+                rotateSpeed = 2.6f;
                 break;
         }
     }
@@ -845,13 +891,20 @@ public class BossController : MonoBehaviour, IDamageable
     float GetAggressionMultiplier()
     {
         if (maxHealth <= 0f) return 1f;
+
         float hpRatio  = currentHealth / maxHealth;
         float baseAggr = Mathf.Lerp(maxAggressionMult, 1f, hpRatio);
+
         switch (currentPhase)
         {
-            case BossPhase.Phase2: return baseAggr * 1.15f;
-            case BossPhase.Phase3: return baseAggr * 1.25f;
-            default:               return baseAggr;
+            case BossPhase.Phase2:
+                return baseAggr * 1.15f;
+
+            case BossPhase.Phase3:
+                return baseAggr * 1.25f;
+
+            default:
+                return baseAggr;
         }
     }
 
@@ -874,31 +927,49 @@ public class BossController : MonoBehaviour, IDamageable
         for (int i = 0; i < bossRenderers.Length; i++)
         {
             Renderer r = bossRenderers[i];
-            if (r == null || r.sharedMaterial == null) { originalColors[i] = normalFallbackColor; continue; }
+
+            if (r == null || r.sharedMaterial == null)
+            {
+                originalColors[i] = normalFallbackColor;
+                continue;
+            }
 
             Material mat = r.sharedMaterial;
-            if (mat.HasProperty(BaseColorID))      originalColors[i] = mat.GetColor(BaseColorID);
-            else if (mat.HasProperty(ColorID))     originalColors[i] = mat.GetColor(ColorID);
-            else                                   originalColors[i] = normalFallbackColor;
+
+            if (mat.HasProperty(BaseColorID))
+                originalColors[i] = mat.GetColor(BaseColorID);
+            else if (mat.HasProperty(ColorID))
+                originalColors[i] = mat.GetColor(ColorID);
+            else
+                originalColors[i] = normalFallbackColor;
         }
     }
 
     void ApplyShieldVisualState(bool force)
     {
         bool invulnerable = IsInvulnerable();
-        if (!force && invulnerable == lastInvulnerableState) return;
+
+        if (!force && invulnerable == lastInvulnerableState)
+            return;
 
         lastInvulnerableState = invulnerable;
-        if (flashRoutine != null) return;
 
-        if (invulnerable) SetBossVisualColor(invulnerableColor, true);
-        else              RestoreBaseVisualColor();
+        if (flashRoutine != null)
+            return;
+
+        if (invulnerable)
+            SetBossVisualColor(invulnerableColor, true);
+        else
+            RestoreBaseVisualColor();
     }
 
     void SetBossVisualColor(Color color, bool useEmission)
     {
-        if (bossRenderers == null || bossRenderers.Length == 0) CacheBossRenderers();
-        if (bossRenderers == null || propertyBlock == null) return;
+        if (bossRenderers == null || bossRenderers.Length == 0)
+            CacheBossRenderers();
+
+        if (bossRenderers == null || propertyBlock == null)
+            return;
 
         Color emissionColor = color * emissionIntensity;
 
@@ -917,7 +988,8 @@ public class BossController : MonoBehaviour, IDamageable
 
     void RestoreBaseVisualColor()
     {
-        if (bossRenderers == null || originalColors == null || propertyBlock == null) return;
+        if (bossRenderers == null || originalColors == null || propertyBlock == null)
+            return;
 
         for (int i = 0; i < bossRenderers.Length; i++)
         {
@@ -936,35 +1008,102 @@ public class BossController : MonoBehaviour, IDamageable
 
     void StartFlash(Color color, float duration)
     {
-        if (flashRoutine != null) StopCoroutine(flashRoutine);
+        if (flashRoutine != null)
+            StopCoroutine(flashRoutine);
+
         flashRoutine = StartCoroutine(FlashRoutine(color, duration));
     }
 
     IEnumerator FlashRoutine(Color color, float duration)
     {
         SetBossVisualColor(color, true);
+
         yield return new WaitForSeconds(duration);
+
         flashRoutine = null;
 
-        if (IsInvulnerable()) SetBossVisualColor(invulnerableColor, true);
-        else                  RestoreBaseVisualColor();
+        if (IsInvulnerable())
+            SetBossVisualColor(invulnerableColor, true);
+        else
+            RestoreBaseVisualColor();
     }
 
     // ═══════════════════════════════════════════════════════════════════════════
-    //  MUERTE
+    //  MUERTE + DROP
     // ═══════════════════════════════════════════════════════════════════════════
     void Die()
     {
+        if (!isActive) return;
+
         isActive = false;
         Debug.Log("[BOSS] Derrotado.");
 
-        // Animator: animación de muerte
         bossAnimator?.SetTrigger(AnimDie);
+
+        DropItem();
 
         if (arena != null)
             arena.EndBossFight();
 
         Destroy(gameObject, 2.5f);
+    }
+
+    void DropItem()
+    {
+        if (hasDroppedItem) return;
+
+        hasDroppedItem = true;
+
+        if (itemDropPrefab == null)
+        {
+            Debug.LogWarning("[BOSS] No hay itemDropPrefab asignado. El boss murió pero no soltó item.");
+            return;
+        }
+
+        int amount = Mathf.Max(1, itemDropAmount);
+
+        Vector3 basePosition = itemDropPoint != null ? itemDropPoint.position : transform.position;
+        basePosition.y += itemDropYOffset;
+
+        for (int i = 0; i < amount; i++)
+        {
+            Vector3 randomOffset = Vector3.zero;
+
+            if (amount > 1)
+            {
+                randomOffset = new Vector3(
+                    Random.Range(-itemDropSpread, itemDropSpread),
+                    0f,
+                    Random.Range(-itemDropSpread, itemDropSpread)
+                );
+            }
+
+            GameObject droppedItem = Instantiate(
+                itemDropPrefab,
+                basePosition + randomOffset,
+                Quaternion.identity
+            );
+
+            Rigidbody itemRb = droppedItem.GetComponent<Rigidbody>();
+
+            if (itemRb != null && itemDropUpForce > 0f)
+            {
+                Vector3 impulse = Vector3.up * itemDropUpForce;
+
+                if (amount > 1)
+                {
+                    impulse += new Vector3(
+                        Random.Range(-0.8f, 0.8f),
+                        0f,
+                        Random.Range(-0.8f, 0.8f)
+                    );
+                }
+
+                itemRb.AddForce(impulse, ForceMode.Impulse);
+            }
+        }
+
+        Debug.Log($"[BOSS] Drop generado: {amount} item(s).");
     }
 
     // ═══════════════════════════════════════════════════════════════════════════
@@ -980,5 +1119,12 @@ public class BossController : MonoBehaviour, IDamageable
 
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, maxDistance);
+
+        Gizmos.color = Color.green;
+
+        Vector3 dropPos = itemDropPoint != null ? itemDropPoint.position : transform.position;
+        dropPos.y += itemDropYOffset;
+
+        Gizmos.DrawWireSphere(dropPos, 0.25f);
     }
 }
