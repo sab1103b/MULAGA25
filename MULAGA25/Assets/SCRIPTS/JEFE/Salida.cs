@@ -34,6 +34,13 @@ public class Salida : MonoBehaviour
 
     void Start()
     {
+        if (orbesalida == null)
+        {
+            GameObject orbeObj = GameObject.FindWithTag("OrbeSalida");
+            if (orbeObj != null)
+                orbesalida = orbeObj.transform;
+        }
+
         puertaClosedRot = Quaternion.Euler(0f, closedAngle, 0f);
         puertaOpenRot = Quaternion.Euler(0f, openAngle, 0f);
 
