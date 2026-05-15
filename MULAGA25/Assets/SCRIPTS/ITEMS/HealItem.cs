@@ -4,28 +4,26 @@ public class HealItem : MonoBehaviour
 {
     public int healAmount = 1;
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
-        PlayerModel player = FindFirstObjectByType<PlayerModel>();
+        PlayerModel player = other.GetComponent<PlayerModel>();
 
-        if (player != null)
+        if (player == null) return;
+        if (player.isDead) return;
+
+        if (player.currentLives < player.maxLives)
         {
-            if (!player.isDead && player.currentLives < player.maxLives)
-            {
-                player.currentLives += healAmount;
+            player.currentLives += healAmount;
 
-                if (player.currentLives > player.maxLives)
-                    player.currentLives = player.maxLives;
+            if (player.currentLives > player.maxLives)
+                player.currentLives = player.maxLives;
 
-                Debug.Log("Jugador curado. Vidas actuales: " + player.currentLives);
+            Debug.Log("Jugador curado. Vidas actuales: " + player.currentLives);
 
-                if (player.hud != null)
-                {
-                    player.hud.SetHealth(player.currentLives);
-                }
+            if (player.hud != null)
+                player.hud.SetHealth(player.currentLives);
 
-                Destroy(gameObject);
-            }
+            Destroy(gameObject);
         }
     }
 }
