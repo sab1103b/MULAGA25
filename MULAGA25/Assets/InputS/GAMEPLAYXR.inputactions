@@ -84,15 +84,6 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Drop",
-                    "type": "Button",
-                    "id": "7d85fc55-663c-43e6-bf08-5c882d86037f",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
                     "name": "Throw",
                     "type": "Button",
                     "id": "6321d090-d7ea-4e53-a46f-99ce31c8c940",
@@ -102,7 +93,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Storage",
+                    "name": "Cycle",
                     "type": "Button",
                     "id": "0ee97e17-fc16-458f-9f8c-168b1d67f17c",
                     "expectedControlType": "",
@@ -125,17 +116,6 @@
                 },
                 {
                     "name": "",
-                    "id": "207644b2-b792-486e-bda8-78479e190955",
-                    "path": "<XRController>{LeftHand}/secondaryButton",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Drop",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "fb650a61-a9d5-4cb6-bf70-3e3bd045668c",
                     "path": "<XRController>{LeftHand}/triggerPressed",
                     "interactions": "",
@@ -152,7 +132,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Storage",
+                    "action": "Cycle",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

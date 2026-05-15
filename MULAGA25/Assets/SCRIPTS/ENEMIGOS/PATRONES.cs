@@ -12,8 +12,20 @@ public class PATRONES : MonoBehaviour
     }
 
     [Header("Player Reference (Assign XR Origin Here)")]
-    public Transform player; 
+    public Transform player;
     private Transform playerHead;
+
+    [Header("Ground Detection")]
+    public float groundCheckDistance = 20f;
+    public float groundOffset = 0.85f;
+    public float heightSmooth = 8f;
+    public LayerMask groundLayer;
+
+    [Header("Obstacle Avoidance")]
+    public float obstacleCheckDistance = 1.5f;
+    public float obstacleRadius = 0.5f;
+    public float obstacleBuffer = 0.1f;
+    public LayerMask obstacleLayer;
 
     [Header("Pattern")]
     public MovementPattern pattern;
@@ -27,14 +39,6 @@ public class PATRONES : MonoBehaviour
     public float orbitDistance = 4f;
     public float orbitSpeed = 60f;
 
-
-    
-    [Header("Limits")]
-    public float xLimit = 10f;
-    public float yMaxLimit = 6f;
-    public float groundLimit = 0.5f;   
-    public float zMinLimit = -50f;
-    public float zMaxLimit = 5f;
     // ZIG ZAG
     private float timer;
     private int zigZagDirection = 1;
@@ -60,16 +64,67 @@ public class PATRONES : MonoBehaviour
     private float jumpTimer = 0f;
 
     public float jumpDistance = 10f;
-    public float jumpHeight = 6f;
+    public float jumpHeight = 3f;
     public float jumpDuration = 1f;
     public float retreatDistance = 25f;
 
+    // AUDIOS
+    [Header("Audio")]
+
+    public AudioClip spawnSFX;
+    public AudioClip deathSFX;
+
+    private AudioSource audioSource;
+
+    void Awake()
+    {
+        audioSource = GetComponent<AudioSource>();
+
+        if (audioSource != null)
+        {
+            audioSource.loop = false;
+            audioSource.playOnAwake = false;
+        }
+    }
     void Start()
     {
         if (player != null)
         {
             playerHead = player.GetComponentInChildren<Camera>()?.transform;
         }
+    }
+
+    void OnEnable()
+    {
+        // Spawn SFX
+        PlaySpawnSFX();
+
+        if (audioSource == null)
+        {
+            Debug.LogWarning("Enemy sin AudioSource", this);
+        }
+    }
+
+    Vector3 AdjustToGround(Vector3 targetPosition)
+    {
+        RaycastHit hit;
+
+        // lanzamos raycast desde arriba del enemigo hacia abajo
+        Vector3 rayOrigin = targetPosition + Vector3.up * 5f;
+
+        if (Physics.Raycast(rayOrigin, Vector3.down, out hit, groundCheckDistance, groundLayer))
+        {
+            float desiredY = hit.point.y + groundOffset;
+
+            // suavizado para evitar vibraciones
+            targetPosition.y = Mathf.Lerp(
+                transform.position.y,
+                desiredY,
+                heightSmooth * Time.deltaTime
+            );
+        }
+
+        return targetPosition;
     }
 
     void Update()
@@ -104,6 +159,16 @@ public class PATRONES : MonoBehaviour
                 break;
         }
 
+
+        // EVITAR OBSTÁCULOS
+        targetPosition = AvoidObstacles(targetPosition);
+
+        // AJUSTE AL SUELO
+        if (!isJumping)
+        {
+            targetPosition = AdjustToGround(targetPosition);
+        }
+
         // APLICAR MOVIMIENTO
         transform.position = targetPosition;
 
@@ -122,8 +187,6 @@ public class PATRONES : MonoBehaviour
                 6f * Time.deltaTime
             );
         }
-
-        ApplyLimits();
     }
     // PATRONES
 
@@ -171,9 +234,7 @@ public class PATRONES : MonoBehaviour
             diveSide = Random.value < 0.5f ? -1f : 1f;
         }
 
-        // =====================
         // GIRO DE 90°
-        // =====================
 
         if (turning)
         {
@@ -195,9 +256,7 @@ public class PATRONES : MonoBehaviour
             return transform.position;
         }
 
-        // =====================
         // Después del giro
-        // =====================
 
         return transform.position + forwardDir * forwardSpeed * Time.deltaTime;
     }
@@ -306,23 +365,54 @@ public class PATRONES : MonoBehaviour
         }
     }
 
-    // ==========================
-    // LÍMITES
-    // ==========================
-
-    void ApplyLimits()
+    Vector3 AvoidObstacles(Vector3 targetPosition)
     {
-        Vector3 pos = transform.position;
+        Vector3 currentPos = transform.position;
+        Vector3 moveDir = targetPosition - currentPos;
 
-        pos.x = Mathf.Clamp(pos.x, -xLimit, xLimit);
+        float moveDistance = moveDir.magnitude;
 
-        if (pos.y < groundLimit)
-            pos.y = groundLimit;
+        if (moveDistance < 0.001f)
+            return targetPosition;
 
-        pos.y = Mathf.Clamp(pos.y, groundLimit, yMaxLimit);
+        moveDir.Normalize();
 
-        pos.z = Mathf.Clamp(pos.z, zMinLimit, zMaxLimit);
+        RaycastHit hit;
 
-        transform.position = pos;
+        if (Physics.SphereCast(currentPos, obstacleRadius, moveDir, out hit, obstacleCheckDistance, obstacleLayer))
+        {
+            // Dirección deslizante
+            Vector3 slideDir = Vector3.ProjectOnPlane(moveDir, hit.normal).normalized;
+
+            // Si queda muy pequeña, usamos dirección lateral
+            if (slideDir.sqrMagnitude < 0.01f)
+            {
+                slideDir = Vector3.Cross(hit.normal, Vector3.up).normalized;
+            }
+
+            // 🔥 CLAVE: mantener la distancia original
+            return currentPos + slideDir * moveDistance;
+        }
+
+        return targetPosition;
+    }
+
+    void PlaySpawnSFX()
+    {
+        if (audioSource != null && spawnSFX != null)
+        {
+            audioSource.PlayOneShot(spawnSFX);
+        }
+    }
+
+    public void PlayDeathSFX()
+    {
+        if (deathSFX != null)
+        {
+            AudioSource.PlayClipAtPoint(
+                deathSFX,
+                transform.position
+            );
+        }
     }
 }

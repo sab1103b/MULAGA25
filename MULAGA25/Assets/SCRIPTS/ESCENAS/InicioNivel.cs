@@ -9,6 +9,6 @@ public class ConsejeroInicioDelay : MonoBehaviour
 
     void LlamarConsejero()
     {
-        ConsejeroManager.Instance.EventoEntraNivel();
+        ConsejeroManager.Instance.Evento06();
     }
 }

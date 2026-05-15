@@ -24,7 +24,10 @@ public class EnemyHealth : MonoBehaviour, IDamageable
 
     private void Die()
     {
+        GetComponent<PATRONES>()?.PlayDeathSFX();
+
         Debug.Log(gameObject.name + " murió");
+
         gameObject.SetActive(false);
     }
 }
