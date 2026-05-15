@@ -10,8 +10,11 @@ public class Salida : MonoBehaviour
 
     [Header("Puerta")]
     public Transform puerta;
-    public float doorRotationAngle = 80f;
     public float doorSpeed = 2f;
+
+    [Header("Ángulos Puerta")]
+    public float closedAngle = 232f;
+    public float openAngle = 142f;
 
     [Header("Detección")]
     public float activationDistance = 0.5f;
@@ -20,7 +23,7 @@ public class Salida : MonoBehaviour
     public float rotationSpeed = 5f;
     public float orbeRotationAngle = -90f;
 
-    private Quaternion puertaInitialRot;
+    private Quaternion puertaClosedRot;
     private Quaternion puertaOpenRot;
 
     private Quaternion orbeInitialRot;
@@ -31,8 +34,8 @@ public class Salida : MonoBehaviour
 
     void Start()
     {
-        puertaInitialRot = puerta.rotation;
-        puertaOpenRot = puertaInitialRot * Quaternion.Euler(0f, doorRotationAngle, 0f);
+        puertaClosedRot = Quaternion.Euler(0f, closedAngle, 0f);
+        puertaOpenRot = Quaternion.Euler(0f, openAngle, 0f);
 
         orbeInitialRot = orbesalida.rotation;
         orbeTargetRot = orbeInitialRot * Quaternion.Euler(0f, orbeRotationAngle, 0f);
@@ -42,7 +45,7 @@ public class Salida : MonoBehaviour
     {
         bool enContacto = Vector3.Distance(orbesalida.position, llavesalida.position) < activationDistance;
 
-        // Rotación del orbe
+        // Rotación orbe
         if (enContacto)
         {
             orbesalida.rotation = Quaternion.Lerp(
@@ -60,30 +63,20 @@ public class Salida : MonoBehaviour
             );
         }
 
-        // Lógica de apertura
-        if (!isOpen && !permanentlyLocked)
+        // Estado puerta
+        if (!permanentlyLocked)
         {
-            if (enContacto)
-                isOpen = true;
+            isOpen = enContacto;
         }
 
-        // ROTACIÓN DE LA PUERTA (no movimiento)
-        if (isOpen)
-        {
-            puerta.rotation = Quaternion.Lerp(
-                puerta.rotation,
-                puertaOpenRot,
-                doorSpeed * Time.deltaTime
-            );
-        }
-        else
-        {
-            puerta.rotation = Quaternion.Lerp(
-                puerta.rotation,
-                puertaInitialRot,
-                doorSpeed * Time.deltaTime
-            );
-        }
+        // Rotación puerta
+        Quaternion targetRot = isOpen ? puertaOpenRot : puertaClosedRot;
+
+        puerta.rotation = Quaternion.Lerp(
+            puerta.rotation,
+            targetRot,
+            doorSpeed * Time.deltaTime
+        );
     }
 
     public void CerrarPuerta()
