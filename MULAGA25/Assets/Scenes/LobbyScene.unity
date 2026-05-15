@@ -2725,6 +2725,10 @@ MonoBehaviour:
   retreatDistance: 25
   spawnSFX: {fileID: 0}
   deathSFX: {fileID: 0}
+  separationDistance: 0.5
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!114 &226693581
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5634,7 +5638,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4015128326712939851, guid: fd28f23af44f73f4a95e33435872ad15, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 1.456
+      value: 1.8
       objectReference: {fileID: 0}
     - target: {fileID: 4015128326712939851, guid: fd28f23af44f73f4a95e33435872ad15, type: 3}
       propertyPath: m_LocalRotation.w
@@ -5654,7 +5658,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4015128326712939851, guid: fd28f23af44f73f4a95e33435872ad15, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 14.894
+      value: 14.23
       objectReference: {fileID: 0}
     - target: {fileID: 4015128326712939851, guid: fd28f23af44f73f4a95e33435872ad15, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -10136,7 +10140,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 5cdce99f2891e474bb89dc1c61d3ddaa, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.97601
+      value: 1.68
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 5cdce99f2891e474bb89dc1c61d3ddaa, type: 3}
       propertyPath: m_LocalPosition.z
@@ -20157,6 +20161,10 @@ MonoBehaviour:
   retreatDistance: 25
   spawnSFX: {fileID: 0}
   deathSFX: {fileID: 0}
+  separationDistance: 0.5
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!114 &1595557577
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20347,6 +20355,10 @@ MonoBehaviour:
   retreatDistance: 25
   spawnSFX: {fileID: 0}
   deathSFX: {fileID: 0}
+  separationDistance: 0.5
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!114 &1595685773
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23416,6 +23428,10 @@ MonoBehaviour:
   retreatDistance: 25
   spawnSFX: {fileID: 0}
   deathSFX: {fileID: 0}
+  separationDistance: 0.5
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!114 &1776148165
 MonoBehaviour:
   m_ObjectHideFlags: 0
