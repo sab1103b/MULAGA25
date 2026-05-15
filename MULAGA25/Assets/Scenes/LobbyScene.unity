@@ -11423,8 +11423,8 @@ MonoBehaviour:
   infoCanvas: {fileID: 100125101}
   fadeSpeed: 4
   scaleSpeed: 6
-  hiddenScale: {x: 0.8, y: 0.8, z: 0.8}
-  visibleScale: {x: 1, y: 1, z: 1}
+  hiddenScale: {x: 0.02, y: 0.02, z: 0.02}
+  visibleScale: {x: 0.01, y: 0.01, z: 0.01}
 --- !u!1001 &924116716
 PrefabInstance:
   m_ObjectHideFlags: 0
