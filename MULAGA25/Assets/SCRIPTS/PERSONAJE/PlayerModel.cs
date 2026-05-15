@@ -23,6 +23,13 @@ public class PlayerModel : MonoBehaviour
     public int maxShields = 1;
     public int currentShields = 0;
 
+    [Header("Audio")]
+    public AudioSource audioSource;
+
+    public AudioClip hitSound;
+    public AudioClip deathSound;
+    public AudioClip footstepSound;
+
     void Awake()
     {
         currentLives = maxLives;
@@ -32,19 +39,26 @@ public class PlayerModel : MonoBehaviour
 
     void BuscarReferencias()
     {
-        // -----------------------------------
         // MAIN CAMERA
-        // -----------------------------------
         Camera cam = Camera.main;
 
         if (cam != null)
         {
             playerCamera = cam.transform;
+
+            // AUDIO SOURCE DE LA CAMARA
+            if (audioSource == null)
+            {
+                audioSource = cam.GetComponent<AudioSource>();
+
+                if (audioSource == null)
+                {
+                    audioSource = cam.GetComponentInChildren<AudioSource>();
+                }
+            }
         }
 
-        // -----------------------------------
         // HUD_VR
-        // -----------------------------------
         GameObject hudVR = GameObject.Find("HUD_VR");
 
         if (hudVR != null)
@@ -52,15 +66,20 @@ public class PlayerModel : MonoBehaviour
             hud = hudVR.GetComponentInChildren<HUD_HealthSystem>(true);
         }
 
-        // -----------------------------------
         // UI DEATH CANVAS
-        // -----------------------------------
         GameObject deathUI = GameObject.Find("UI Death Canvas");
 
         if (deathUI != null)
         {
             deathCanvas = deathUI;
         }
+
+        // CARGA DE AUDIOS (RESOURCES)
+        // -----------------------------------
+        hitSound = Resources.Load<AudioClip>("Audios/Efectos/Jugador/Hit");
+        deathSound = Resources.Load<AudioClip>("Audios/Efectos/Jugador/Derrota");
+        footstepSound = Resources.Load<AudioClip>("Audios/Efectos/Jugador/Pasos");
+
     }
 
     public void TakeDamage(int amount)
@@ -68,6 +87,12 @@ public class PlayerModel : MonoBehaviour
         if (isDead) return;
 
         currentLives -= amount;
+
+        // SONIDO DE DAÑO
+        if (hitSound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(hitSound);
+        }
 
         if (currentLives <= 0)
         {
@@ -92,6 +117,14 @@ public class PlayerModel : MonoBehaviour
     void Morir()
     {
         isDead = true;
+
+        // SONIDO DE MUERTE
+        if (deathSound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(deathSound);
+        }
+
+        Time.timeScale = 0f;
 
         // BLOQUEAR MOVIMIENTO
         var controller = GetComponent<CharacterController>();
@@ -118,13 +151,23 @@ public class PlayerModel : MonoBehaviour
         Vector3 pos = playerCamera.position + forward * 2f;
         ui.transform.position = pos;
 
-        // ROTACIÓN CORRECTA SOLO EN Y
+        // ROTACIÓN SOLO EN Y
         Vector3 lookDirection = playerCamera.position - ui.transform.position;
         lookDirection.y = 0f;
 
         ui.transform.rotation = Quaternion.LookRotation(lookDirection);
     }
 
+    // -------------------------
+    // FOOTSTEPS
+    // -------------------------
+    public void PlayFootstep()
+    {
+        if (footstepSound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(footstepSound);
+        }
+    }
 
     public void AddFragment()
     {
