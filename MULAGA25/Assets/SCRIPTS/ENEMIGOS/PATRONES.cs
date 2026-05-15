@@ -121,6 +121,13 @@ public class PATRONES : MonoBehaviour
     private AudioSource audioSource;
 
     // ─────────────────────────────────────────────
+    // ANTI OVERLAP (PARA EVITAR QUE SE APILEN VARIOS ENEMIGOS)
+    // ─────────────────────────────────────────────
+    [Header("Anti-Overlap")]
+    public float separationDistance = 0.5f;
+    public LayerMask enemyLayer;
+
+    // ─────────────────────────────────────────────
     // UNITY
     // ─────────────────────────────────────────────
 
@@ -180,6 +187,7 @@ public class PATRONES : MonoBehaviour
         }
 
         targetPosition = AvoidObstacles(targetPosition);
+        targetPosition = ApplySeparation(targetPosition);
 
         if (!isJumping)
             targetPosition = AdjustToGround(targetPosition);
@@ -419,5 +427,33 @@ public class PATRONES : MonoBehaviour
     {
         if (deathSFX != null)
             AudioSource.PlayClipAtPoint(deathSFX, transform.position);
+    }
+
+    Vector3 ApplySeparation(Vector3 currentPosition)
+    {
+        Collider[] nearby = Physics.OverlapSphere(currentPosition, separationDistance, enemyLayer);
+
+        Vector3 separation = Vector3.zero;
+        int count = 0;
+
+        foreach (Collider col in nearby)
+        {
+            if (col.gameObject == gameObject) continue;
+
+            Vector3 dir = currentPosition - col.transform.position;
+            float dist = dir.magnitude;
+
+            if (dist < 0.0001f) continue;
+
+            separation += dir.normalized / dist;
+            count++;
+        }
+
+        if (count == 0) return currentPosition;
+
+        separation /= count;
+        separation = separation.normalized * separationDistance;
+
+        return currentPosition + separation;
     }
 }

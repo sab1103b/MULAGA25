@@ -151,6 +151,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PATRONES_Rango
   player: {fileID: 0}
+  animator: {fileID: 0}
+  shootTriggerName: Shoot
+  speedParamName: Speed
+  dieTriggerName: Die
+  useSpeedParameter: 0
+  useDieParameter: 0
   groundCheckDistance: 20
   groundOffset: 0.1
   heightSmooth: 8
@@ -184,6 +190,10 @@ MonoBehaviour:
   spawnSFX: {fileID: 8300000, guid: 17abae02f31fd624c88ee02c6bd30860, type: 3}
   attackSFX: {fileID: 8300000, guid: bd8480b4b63b57a44aea4a42d70f1a52, type: 3}
   deathSFX: {fileID: 8300000, guid: aa9b446e8ac81be4b836262c9af1223e, type: 3}
+  separationDistance: 0.5
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!114 &7322678973353587554
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -202,6 +212,7 @@ MonoBehaviour:
   probItem1: 0.05
   probItem2: 0.03
   probItem3: 0.05
+  deathAnimationDuration: 1.5
 --- !u!114 &2929264873300460889
 MonoBehaviour:
   m_ObjectHideFlags: 0
