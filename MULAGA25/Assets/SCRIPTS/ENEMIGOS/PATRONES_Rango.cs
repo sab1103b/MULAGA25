@@ -118,6 +118,13 @@ public class PATRONES_Rango : MonoBehaviour
     private bool isFiringBurst = false;
     private bool isDead = false;
 
+
+    // ─────────────────────────────────────────────
+    // ANTI OVERLAP 
+    // ─────────────────────────────────────────────
+    [Header("Anti-Overlap")]
+    public float separationDistance = 0.5f;
+    public LayerMask enemyLayer;
     // ─────────────────────────────────────────────
     // UNITY
     // ─────────────────────────────────────────────
@@ -184,6 +191,7 @@ public class PATRONES_Rango : MonoBehaviour
 
         targetPos = AvoidObstacles(targetPos);
         targetPos = AdjustToGround(targetPos);
+        targetPos = ApplySeparation(targetPos);
 
         transform.position = targetPos;
 
@@ -618,5 +626,33 @@ public class PATRONES_Rango : MonoBehaviour
             Gizmos.color = Color.magenta;
             Gizmos.DrawSphere(firePoint.position, 0.12f);
         }
+    }
+
+    Vector3 ApplySeparation(Vector3 currentPosition)
+    {
+        Collider[] nearby = Physics.OverlapSphere(currentPosition, separationDistance, enemyLayer);
+
+        Vector3 separation = Vector3.zero;
+        int count = 0;
+
+        foreach (Collider col in nearby)
+        {
+            if (col.gameObject == gameObject) continue;
+
+            Vector3 dir = currentPosition - col.transform.position;
+            float dist = dir.magnitude;
+
+            if (dist < 0.0001f) continue;
+
+            separation += dir.normalized / dist;
+            count++;
+        }
+
+        if (count == 0) return currentPosition;
+
+        separation /= count;
+        separation = separation.normalized * separationDistance;
+
+        return currentPosition + separation;
     }
 }
