@@ -30,11 +30,10 @@ public class DeployableShield : MonoBehaviour
     [SerializeField] private float floorOffset = 0.03f;
 
     [Header("Orientación")]
-    [Tooltip("Ajuste de rotación extra si el mesh del escudo sale girado (ej: 90 si sale de lado).")]
+    [Tooltip("Ajusta si el mesh sale girado. Prueba 0, 90, 180, 270.")]
     [SerializeField] private float meshRotationOffset = 0f;
 
-    // Se asigna desde ShieldBombItem antes de llamar Deploy()
-    // para saber en qué dirección miraba el jugador al lanzar.
+    // Asignado por ShieldBombItem antes de llamar Deploy()
     [HideInInspector] public Vector3 throwerForward = Vector3.forward;
 
     private int currentHealth;
@@ -47,7 +46,6 @@ public class DeployableShield : MonoBehaviour
         transform.localScale = Vector3.zero;
     }
 
-    // Llamado por ShieldBombItem al caer
     public void Deploy(Vector3 position, Vector3 surfaceNormal)
     {
         if (isDeployed) return;
@@ -59,12 +57,20 @@ public class DeployableShield : MonoBehaviour
 
         if (!validFloor)
         {
-            Debug.Log("[SHIELD] No se desplegó porque no encontró piso válido.");
+            Debug.Log("[SHIELD] No se desplegó: no encontró piso válido.");
             Destroy(gameObject);
             return;
         }
 
         isDeployed = true;
+
+        // Kinematic: nadie puede empujarlo
+        Rigidbody rb = GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.isKinematic = true;
+            rb.useGravity = false;
+        }
 
         transform.position = finalPosition;
         transform.rotation = GetShieldRotation(finalNormal);
@@ -95,15 +101,12 @@ public class DeployableShield : MonoBehaviour
             return true;
         }
 
+        // Tocó pared — busca piso debajo
         Vector3 rayStart = originalPosition + Vector3.up * groundCheckStartHeight;
 
         if (Physics.Raycast(
-                rayStart,
-                Vector3.down,
-                out RaycastHit hit,
-                groundCheckDistance,
-                groundMask,
-                QueryTriggerInteraction.Ignore))
+                rayStart, Vector3.down, out RaycastHit hit,
+                groundCheckDistance, groundMask, QueryTriggerInteraction.Ignore))
         {
             if (IsFloorNormal(hit.normal))
             {
@@ -118,17 +121,15 @@ public class DeployableShield : MonoBehaviour
 
     private bool IsFloorNormal(Vector3 normal)
     {
-        if (normal.sqrMagnitude <= 0.001f)
-            return false;
-
+        if (normal.sqrMagnitude <= 0.001f) return false;
         float angle = Vector3.Angle(normal.normalized, Vector3.up);
         return angle <= maxGroundAngle;
     }
 
     private Quaternion GetShieldRotation(Vector3 floorNormal)
     {
-        // Usamos el forward del jugador en el momento del lanzamiento.
-        // Proyectado sobre el plano del piso para que el escudo quede vertical.
+        // throwerForward ya viene horizontal (Y=0) desde ShieldBombItem.
+        // Lo proyectamos sobre el plano del piso por si el suelo es una rampa.
         Vector3 forward = Vector3.ProjectOnPlane(throwerForward, floorNormal);
 
         if (forward.sqrMagnitude <= 0.001f)
@@ -146,7 +147,6 @@ public class DeployableShield : MonoBehaviour
     private IEnumerator DeployAnimation()
     {
         float elapsed = 0f;
-
         while (elapsed < deployDuration)
         {
             elapsed += Time.deltaTime;
@@ -154,30 +154,22 @@ public class DeployableShield : MonoBehaviour
             transform.localScale = Vector3.Lerp(Vector3.zero, deployedScale, t);
             yield return null;
         }
-
         transform.localScale = deployedScale;
     }
 
     private IEnumerator LifetimeRoutine()
     {
-        float waitTime = Mathf.Max(0f, lifetime - 1f);
-        yield return new WaitForSeconds(waitTime);
+        yield return new WaitForSeconds(Mathf.Max(0f, lifetime - 1f));
 
-        float blinkTime = 1f;
         float elapsed = 0f;
         Renderer[] renderers = GetComponentsInChildren<Renderer>();
 
-        while (elapsed < blinkTime)
+        while (elapsed < 1f)
         {
             elapsed += Time.deltaTime;
             bool visible = Mathf.FloorToInt(elapsed / 0.1f) % 2 == 0;
-
             foreach (Renderer r in renderers)
-            {
-                if (r != null)
-                    r.enabled = visible;
-            }
-
+                if (r != null) r.enabled = visible;
             yield return null;
         }
 
@@ -188,8 +180,7 @@ public class DeployableShield : MonoBehaviour
     {
         if (!isDeployed) return;
         currentHealth -= damage;
-        if (currentHealth <= 0)
-            DestroyShield();
+        if (currentHealth <= 0) DestroyShield();
     }
 
     private void DestroyShield()
@@ -206,10 +197,7 @@ public class DeployableShield : MonoBehaviour
         Destroy(gameObject);
     }
 
-    public bool IsAlive()
-    {
-        return isDeployed && currentHealth > 0;
-    }
+    public bool IsAlive() => isDeployed && currentHealth > 0;
 
     private void OnDrawGizmosSelected()
     {
