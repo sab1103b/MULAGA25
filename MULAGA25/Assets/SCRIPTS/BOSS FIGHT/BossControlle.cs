@@ -44,6 +44,7 @@ public class BossController : MonoBehaviour, IDamageable
     [Header("Drop al morir")]
     [Tooltip("Prefab del item que el boss va a soltar cuando muera.")]
     public GameObject itemDropPrefab;
+    public GameObject itemDropPrefab2;
 
     [Tooltip("Punto exacto donde aparece el item. Si está vacío, aparece en la posición del boss.")]
     public Transform itemDropPoint;
@@ -62,6 +63,7 @@ public class BossController : MonoBehaviour, IDamageable
 
     [Tooltip("Evita que el boss dropee dos veces si Die() se llama más de una vez.")]
     private bool hasDroppedItem = false;
+    private bool hasDroppedItem2 = false;
 
     // ═══════════════════════════════════════════════════════════════════════════
     //  MOVIMIENTO FELINO VR FRIENDLY
@@ -307,6 +309,8 @@ public class BossController : MonoBehaviour, IDamageable
         isAttacking              = false;
         isSteppingBackFromDamage = false;
         hasDroppedItem           = false;
+        hasDroppedItem2          = false;
+
 
         currentPhase  = BossPhase.Phase1;
         currentHealth = maxHealth;
@@ -1051,8 +1055,10 @@ public class BossController : MonoBehaviour, IDamageable
     void DropItem()
     {
         if (hasDroppedItem) return;
+        if (hasDroppedItem2) return;
 
         hasDroppedItem = true;
+        hasDroppedItem2 = true;
 
         if (itemDropPrefab == null)
         {
@@ -1080,6 +1086,12 @@ public class BossController : MonoBehaviour, IDamageable
 
             GameObject droppedItem = Instantiate(
                 itemDropPrefab,
+                basePosition + randomOffset,
+                Quaternion.identity
+            );
+
+            GameObject droppedItem2 = Instantiate(
+                itemDropPrefab2,
                 basePosition + randomOffset,
                 Quaternion.identity
             );
