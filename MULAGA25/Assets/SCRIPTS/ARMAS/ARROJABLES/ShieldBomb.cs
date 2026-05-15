@@ -28,6 +28,7 @@ public class ShieldBombItem : ThrowableItem
         if (hasTriggered) return;
         if (Time.time < armedTime) return;
         if (((1 << collision.gameObject.layer) & groundMask) == 0) return;
+        if (collision.contactCount == 0) return;
 
         ContactPoint contact = collision.GetContact(0);
         lastContactPoint = contact.point;
@@ -36,7 +37,6 @@ public class ShieldBombItem : ThrowableItem
         TriggerActivation();
     }
 
-    // ─── ÚNICO FuseRoutine, reemplaza el de la base ───────────
     protected override IEnumerator FuseRoutine()
     {
         yield return new WaitForSeconds(fuseTime);
@@ -68,6 +68,17 @@ public class ShieldBombItem : ThrowableItem
             return;
         }
 
+        // Capturamos el forward de la cámara aquí, justo al activarse.
+        // Aplanamos Y para ignorar el pitch y que el escudo quede vertical.
+        Vector3 cameraForward = Vector3.forward;
+        if (Camera.main != null)
+        {
+            Vector3 f = Camera.main.transform.forward;
+            f.y = 0f;
+            if (f.sqrMagnitude > 0.001f)
+                cameraForward = f.normalized;
+        }
+
         Vector3 spawnPos = lastContactPoint + lastContactNormal * groundOffset;
 
         GameObject shieldObj = Instantiate(deployableShieldPrefab,
@@ -75,7 +86,10 @@ public class ShieldBombItem : ThrowableItem
 
         DeployableShield shield = shieldObj.GetComponent<DeployableShield>();
         if (shield != null)
+        {
+            shield.throwerForward = cameraForward;
             shield.Deploy(spawnPos, lastContactNormal);
+        }
 
         Destroy(gameObject);
     }

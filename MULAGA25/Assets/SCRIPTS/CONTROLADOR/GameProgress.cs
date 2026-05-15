@@ -8,6 +8,9 @@ public class GameProgress : MonoBehaviour
     [Header("Tutorial")]
     public bool tutorialCompletado = false;
 
+    [Header("Nivel 1")]
+    public bool nivel1ObjetoRecogido = false;
+
     [Header("Progresión")]
     public int nivelActual = 0;
 
@@ -99,5 +102,10 @@ public class GameProgress : MonoBehaviour
         UnlockLevel(siguienteNivel);
 
         nivelActual = siguienteNivel;
+    }
+
+    public void RecogerNivel1()
+    {
+        nivel1ObjetoRecogido = true;
     }
 }

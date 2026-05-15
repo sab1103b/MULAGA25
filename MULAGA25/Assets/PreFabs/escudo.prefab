@@ -222,7 +222,8 @@ GameObject:
   - component: {fileID: 4391384016059987047}
   - component: {fileID: -8942729888144760304}
   - component: {fileID: 539851779712441239}
-  - component: {fileID: -8517052783839591178}
+  - component: {fileID: -6249471055453268346}
+  - component: {fileID: 2446993089565484913}
   m_Layer: 0
   m_Name: escudo
   m_TagString: Untagged
@@ -238,8 +239,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4015668056962707165}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -11.900896, y: -0.20247889, z: 91.695694}
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
+  m_LocalPosition: {x: -11.637079, y: -0.20247889, z: 92.23647}
   m_LocalScale: {x: 5, y: 5, z: 5}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -249,7 +250,7 @@ Transform:
   - {fileID: 7685145436497991750}
   - {fileID: 808092397649111416}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!114 &-8942729888144760304
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -275,7 +276,7 @@ MonoBehaviour:
   groundCheckStartHeight: 1.5
   groundCheckDistance: 4
   floorOffset: 0.03
-  meshRotationOffset: 0
+  meshRotationOffset: 90
   throwerForward: {x: 0, y: 0, z: 1}
 --- !u!54 &539851779712441239
 Rigidbody:
@@ -304,7 +305,29 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 2
---- !u!65 &-8517052783839591178
+--- !u!64 &-6249471055453268346
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4015668056962707165}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 0}
+--- !u!65 &2446993089565484913
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -323,8 +346,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.17644654, y: 0.42867756, z: 0.5960329}
-  m_Center: {x: 0.042407986, y: 0.2235868, z: 0.06443777}
+  m_Size: {x: 0.05796986, y: 1, z: 0.5182115}
+  m_Center: {x: -0.03170137, y: 0, z: 0.04566798}
 --- !u!1 &4630323976701248611
 GameObject:
   m_ObjectHideFlags: 0
