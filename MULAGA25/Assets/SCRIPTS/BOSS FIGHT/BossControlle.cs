@@ -1055,68 +1055,39 @@ public class BossController : MonoBehaviour, IDamageable
     void DropItem()
     {
         if (hasDroppedItem) return;
-        if (hasDroppedItem2) return;
+        if (itemDropPrefab2 == null) return;
 
         hasDroppedItem = true;
-        hasDroppedItem2 = true;
-
-        if (itemDropPrefab == null)
-        {
-            Debug.LogWarning("[BOSS] No hay itemDropPrefab asignado. El boss murió pero no soltó item.");
-            return;
-        }
-
-        int amount = Mathf.Max(1, itemDropAmount);
 
         Vector3 basePosition = itemDropPoint != null ? itemDropPoint.position : transform.position;
         basePosition.y += itemDropYOffset;
 
-        for (int i = 0; i < amount; i++)
+        GameObject droppedItem2 = Instantiate(
+            itemDropPrefab2,
+            basePosition,
+            Quaternion.identity
+        );
+
+        // 🔥 REGISTRO AUTOMÁTICO EN SALIDA
+        Salida salida = FindFirstObjectByType<Salida>();
+
+        if (salida != null)
         {
-            Vector3 randomOffset = Vector3.zero;
-
-            if (amount > 1)
-            {
-                randomOffset = new Vector3(
-                    Random.Range(-itemDropSpread, itemDropSpread),
-                    0f,
-                    Random.Range(-itemDropSpread, itemDropSpread)
-                );
-            }
-
-            GameObject droppedItem = Instantiate(
-                itemDropPrefab,
-                basePosition + randomOffset,
-                Quaternion.identity
-            );
-
-            GameObject droppedItem2 = Instantiate(
-                itemDropPrefab2,
-                basePosition + randomOffset,
-                Quaternion.identity
-            );
-
-            Rigidbody itemRb = droppedItem.GetComponent<Rigidbody>();
-
-            if (itemRb != null && itemDropUpForce > 0f)
-            {
-                Vector3 impulse = Vector3.up * itemDropUpForce;
-
-                if (amount > 1)
-                {
-                    impulse += new Vector3(
-                        Random.Range(-0.8f, 0.8f),
-                        0f,
-                        Random.Range(-0.8f, 0.8f)
-                    );
-                }
-
-                itemRb.AddForce(impulse, ForceMode.Impulse);
-            }
+            salida.RegistrarOrbeBoss(droppedItem2.transform);
         }
 
-        Debug.Log($"[BOSS] Drop generado: {amount} item(s).");
+        Rigidbody rb = droppedItem2.GetComponent<Rigidbody>();
+
+        if (rb != null && itemDropUpForce > 0f)
+        {
+            Vector3 impulse = Vector3.up * itemDropUpForce;
+            rb.AddForce(impulse, ForceMode.Impulse);
+        }
+
+        Debug.Log("[BOSS] Orbe dropeado y registrado en puerta.");
     }
+
+
 
     // ═══════════════════════════════════════════════════════════════════════════
     //  GIZMOS

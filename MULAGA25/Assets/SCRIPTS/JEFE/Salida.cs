@@ -1,4 +1,4 @@
-using UnityEngine;
+锘縰sing UnityEngine;
 
 public class Salida : MonoBehaviour
 {
@@ -12,14 +12,14 @@ public class Salida : MonoBehaviour
     public Transform puerta;
     public float doorSpeed = 2f;
 
-    [Header("羘gulos Puerta")]
+    [Header("脕ngulos Puerta")]
     public float closedAngle = 232f;
     public float openAngle = 142f;
 
-    [Header("Detecci髇")]
+    [Header("Detecci贸n")]
     public float activationDistance = 0.5f;
 
-    [Header("Rotaci髇 Orbe")]
+    [Header("Rotaci贸n Orbe")]
     public float rotationSpeed = 5f;
     public float orbeRotationAngle = -90f;
 
@@ -34,25 +34,17 @@ public class Salida : MonoBehaviour
 
     void Start()
     {
-        if (orbesalida == null)
-        {
-            GameObject orbeObj = GameObject.FindWithTag("OrbeSalida");
-            if (orbeObj != null)
-                orbesalida = orbeObj.transform;
-        }
-
         puertaClosedRot = Quaternion.Euler(0f, closedAngle, 0f);
         puertaOpenRot = Quaternion.Euler(0f, openAngle, 0f);
-
-        orbeInitialRot = orbesalida.rotation;
-        orbeTargetRot = orbeInitialRot * Quaternion.Euler(0f, orbeRotationAngle, 0f);
     }
 
     void Update()
     {
+        if (orbesalida == null || llavesalida == null) return;
+
         bool enContacto = Vector3.Distance(orbesalida.position, llavesalida.position) < activationDistance;
 
-        // Rotaci髇 orbe
+        // Rotaci贸n orbe
         if (enContacto)
         {
             orbesalida.rotation = Quaternion.Lerp(
@@ -70,13 +62,10 @@ public class Salida : MonoBehaviour
             );
         }
 
-        // Estado puerta
+        // l贸gica de puerta
         if (!permanentlyLocked)
-        {
             isOpen = enContacto;
-        }
 
-        // Rotaci髇 puerta
         Quaternion targetRot = isOpen ? puertaOpenRot : puertaClosedRot;
 
         puerta.rotation = Quaternion.Lerp(
@@ -84,6 +73,15 @@ public class Salida : MonoBehaviour
             targetRot,
             doorSpeed * Time.deltaTime
         );
+    }
+
+    // 馃敟 REGISTRO DEL ORBE SPAWN DEL BOSS
+    public void RegistrarOrbeBoss(Transform nuevoOrbe)
+    {
+        orbesalida = nuevoOrbe;
+
+        orbeInitialRot = orbesalida.rotation;
+        orbeTargetRot = orbeInitialRot * Quaternion.Euler(0f, orbeRotationAngle, 0f);
     }
 
     public void CerrarPuerta()
